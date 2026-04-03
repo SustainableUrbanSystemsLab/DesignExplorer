@@ -1,0 +1,41 @@
+{
+  "name": "design-explorer",
+  "private": true,
+  "version": "3.0.0",
+  "type": "module",
+  "description": "Interactive multi-dimensional parametric design space explorer for architects and urban designers",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
+    "lint": "eslint . && prettier --check .",
+    "lint:fix": "eslint --fix . && prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "@tailwindcss/vite": "^4.1.0",
+    "@tsconfig/svelte": "^5.0.8",
+    "@types/d3": "^7.4.3",
+    "@types/node": "^24.12.0",
+    "@types/three": "^0.170.0",
+    "eslint": "^9.0.0",
+    "jsdom": "^28.1.0",
+    "prettier": "^3.4.0",
+    "prettier-plugin-svelte": "^3.3.0",
+    "svelte": "^5.53.12",
+    "svelte-check": "^4.4.5",
+    "tailwindcss": "^4.1.0",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.1",
+    "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "d3": "^7.9.0",
+    "fflate": "^0.8.2",
+    "three": "^0.170.0"
+  }
+}

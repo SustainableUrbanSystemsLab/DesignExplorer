@@ -1,0 +1,11 @@
+Description,in:width,in:length,in:height,out:surfaceArea,out:volume,out:edgeLength,img,threeD
+1_1_1,1,1,1,24,8,24,1_1_1_Perspective.png,1_1_1.json
+1_1_2,1,1,2,32,12,28,1_1_2_Perspective.png,1_1_2.json
+1_1_3,1,1,3,40,16,32,1_1_3_Perspective.png,1_1_3.json
+1_2_1,1,2,1,32,12,28,1_2_1_Perspective.png,1_2_1.json
+1_2_2,1,2,2,40,16,32,1_2_2_Perspective.png,1_2_2.json
+2_1_1,2,1,1,40,16,32,2_1_1_Perspective.png,2_1_1.json
+2_1_2,2,1,2,56,24,40,2_1_2_Perspective.png,2_1_2.json
+2_2_1,2,2,1,56,24,40,2_2_1_Perspective.png,2_2_1.json
+3_1_1,3,1,1,56,24,40,3_1_1_Perspective.png,3_1_1.json
+3_3_3,3,3,3,120,108,72,3_3_3_Perspective.png,3_3_3.json

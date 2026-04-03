@@ -1,0 +1,64 @@
+@import 'tailwindcss';
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Range slider styling */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #2563eb;
+  margin-top: -4px;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+}
+
+/* D3 brush styling overrides */
+.brush .selection {
+  fill: #3b82f6;
+  fill-opacity: 0.2;
+  stroke: #2563eb;
+  stroke-width: 1px;
+}
+
+.brush .handle {
+  fill: #2563eb;
+}
+
+/* Prevent text selection during brush interaction */
+svg {
+  user-select: none;
+  -webkit-user-select: none;
+}

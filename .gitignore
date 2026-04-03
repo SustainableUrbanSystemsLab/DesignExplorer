@@ -1,6 +1,36 @@
-.idea/scopes/scope_settings.xml
-.idea/workspace.xml
-.idea/DesignExplorer.iml
-.idea/encodings.xml
-*.xml
-index.html___jb_old___
+# Dependencies
+node_modules
+
+# Build output
+dist
+dist-ssr
+
+# Environment
+*.local
+.env
+.env.*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test
+coverage
+
+# Large binary assets (should not be in git)
+*.ai
+*.psd
