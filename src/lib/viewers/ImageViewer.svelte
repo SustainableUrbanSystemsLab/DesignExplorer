@@ -20,16 +20,16 @@
   });
 </script>
 
-<div class="w-full h-full flex flex-col bg-gray-900">
+<div class="w-full h-full flex flex-col bg-gray-100">
   <!-- Image column selector (if multiple) -->
   {#if dataset.imageColumns.length > 1}
-    <div class="flex gap-1 p-1 bg-gray-800">
+    <div class="flex gap-1 p-1 bg-gray-200">
       {#each dataset.imageColumns as col}
         <button
           class="px-2 py-0.5 text-xs rounded transition-colors
             {activeImageCol === col.originalName
               ? 'bg-blue-600 text-white'
-              : 'text-gray-400 hover:text-white'}"
+              : 'text-gray-500 hover:text-gray-700'}"
           onclick={() => (activeImageCol = col.originalName)}
         >
           {col.displayName}

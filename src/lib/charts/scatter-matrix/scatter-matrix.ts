@@ -50,10 +50,16 @@ export function renderScatterMatrix(
   const width = rect.width;
   const height = rect.height;
   const n = dims.length;
-  const margin = 30;
+
+  // Increase margins to prevent label clipping
+  const marginLeft = 80;
+  const marginTop = 10;
+  const marginRight = 15;
+  const marginBottom = 60;
+
   const cellSize = Math.min(
-    (width - margin * 2) / n,
-    (height - margin * 2) / n
+    (width - marginLeft - marginRight) / n,
+    (height - marginTop - marginBottom) / n
   );
 
   svg.attr('width', width).attr('height', height);
@@ -72,7 +78,7 @@ export function renderScatterMatrix(
 
   const g = svg
     .append('g')
-    .attr('transform', `translate(${margin}, ${margin})`);
+    .attr('transform', `translate(${marginLeft}, ${marginTop})`);
 
   // Draw cells
   for (let i = 0; i < n; i++) {
@@ -103,7 +109,9 @@ export function renderScatterMatrix(
           .attr('y', cellSize / 2)
           .attr('text-anchor', 'middle')
           .attr('dominant-baseline', 'central')
-          .attr('class', 'text-[10px] font-medium fill-gray-700')
+          .attr('font-size', '10px')
+          .attr('font-weight', '500')
+          .attr('fill', '#374151')
           .text(dimX.displayName);
         continue;
       }
@@ -153,21 +161,25 @@ export function renderScatterMatrix(
 
   // Axis labels on edges
   for (let i = 0; i < n; i++) {
-    // Bottom labels
+    // Bottom labels — rotated to avoid overlap
     g.append('text')
       .attr('x', i * cellSize + cellSize / 2)
-      .attr('y', n * cellSize + 16)
-      .attr('text-anchor', 'middle')
-      .attr('class', 'text-[9px] fill-gray-500')
+      .attr('y', n * cellSize + 12)
+      .attr('text-anchor', 'end')
+      .attr('dominant-baseline', 'central')
+      .attr('transform', `rotate(-35, ${i * cellSize + cellSize / 2}, ${n * cellSize + 12})`)
+      .attr('font-size', '10px')
+      .attr('fill', '#6b7280')
       .text(dims[i].displayName);
 
     // Left labels
     g.append('text')
-      .attr('x', -8)
+      .attr('x', -10)
       .attr('y', i * cellSize + cellSize / 2)
       .attr('text-anchor', 'end')
       .attr('dominant-baseline', 'central')
-      .attr('class', 'text-[9px] fill-gray-500')
+      .attr('font-size', '10px')
+      .attr('fill', '#6b7280')
       .text(dims[i].displayName);
   }
 }

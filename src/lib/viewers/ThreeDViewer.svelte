@@ -54,7 +54,7 @@
 
   function initScene() {
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1a2e);
+    scene.background = new THREE.Color(0xf3f4f6);
 
     camera = new THREE.PerspectiveCamera(50, 1, 0.1, 10000);
     camera.position.set(5, 5, 5);
@@ -80,7 +80,7 @@
     scene.add(dirLight2);
 
     // Grid
-    const grid = new THREE.GridHelper(20, 20, 0x444466, 0x333355);
+    const grid = new THREE.GridHelper(20, 20, 0xd1d5db, 0xe5e7eb);
     scene.add(grid);
 
     handleResize();
@@ -164,16 +164,16 @@
   });
 </script>
 
-<div class="w-full h-full flex flex-col bg-gray-900">
+<div class="w-full h-full flex flex-col bg-gray-100">
   <!-- 3D column selector -->
   {#if dataset.threeDColumns.length > 1}
-    <div class="flex gap-1 p-1 bg-gray-800">
+    <div class="flex gap-1 p-1 bg-gray-200">
       {#each dataset.threeDColumns as col}
         <button
           class="px-2 py-0.5 text-xs rounded transition-colors
             {activeThreeDCol === col.originalName
               ? 'bg-blue-600 text-white'
-              : 'text-gray-400 hover:text-white'}"
+              : 'text-gray-500 hover:text-gray-700'}"
           onclick={() => (activeThreeDCol = col.originalName)}
         >
           {col.displayName}
@@ -184,7 +184,7 @@
 
   <div bind:this={containerEl} class="flex-1 relative">
     {#if !modelUrl && !selection.highlighted}
-      <div class="absolute inset-0 flex items-center justify-center text-gray-600 text-sm pointer-events-none">
+      <div class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm pointer-events-none">
         Hover or click a design to view 3D model
       </div>
     {/if}

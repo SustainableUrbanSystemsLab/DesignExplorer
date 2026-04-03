@@ -1,69 +1,42 @@
 # Design Explorer
 
-Interactive multi-dimensional parametric design space explorer for architects and urban designers. Visualize, filter, and compare hundreds of design alternatives generated from parametric studies in tools like Grasshopper/Rhino.
+[![Deploy](https://github.com/SustainableUrbanSystemsLab/DesignExplorer/actions/workflows/deploy.yml/badge.svg)](https://github.com/SustainableUrbanSystemsLab/DesignExplorer/actions/workflows/deploy.yml)
+[![CI](https://github.com/SustainableUrbanSystemsLab/DesignExplorer/actions/workflows/ci.yml/badge.svg)](https://github.com/SustainableUrbanSystemsLab/DesignExplorer/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+Interactive parametric design space explorer. Visualize, filter, and compare design alternatives from Grasshopper/Rhino parametric studies using parallel coordinates, scatter plots, and 2D/3D viewers.
 
 **[Live Demo](https://sustainableurbansystemslab.github.io/DesignExplorer/)**
 
-## Features
+## Quick Start
 
-- **Parallel Coordinates** — Filter multi-dimensional design data with brushable axes. Click dimension labels to color-encode by that metric.
-- **Scatter Matrix** — Analyze correlations between output parameters with selectable dimensions.
-- **2D/3D Viewer** — Preview design images and 3D models (glTF/GLB, STL, OBJ) with orbit controls.
-- **Thumbnail Grid** — Browse and sort all design solutions visually.
-- **Input Sliders** — Navigate the design space by adjusting input parameters; the closest matching design is highlighted automatically.
-- **Favorites** — Mark designs with a heart, filter to favorites only, export as JSON or CSV.
-- **Flexible Data Loading** — Drag & drop CSV/ZIP files, or paste a URL to a hosted dataset.
-- **Shareable Links** — `?url=<csv-url>` query parameter for direct linking to studies.
+```bash
+npm install
+npm run dev
+```
 
 ## CSV Format
 
-Design Explorer expects a CSV with column-name conventions:
-
 | Prefix | Meaning | Example |
 |--------|---------|---------|
-| `in:` | Input parameter | `in:Depth [ft]`, `in:WWR [%]` |
-| `out:` | Output metric | `out:Cooling[kWh]`, `out:DA [%]` |
-| `img` | Image path (relative or absolute URL) | `img`, `img:perspective` |
-| `threeD` | 3D model path (glTF, STL, OBJ) | `threeD`, `threeD:massing` |
-| *(none)* | Metadata | `Description`, `Name` |
+| `in:` | Input parameter | `in:Depth [ft]` |
+| `out:` | Output metric | `out:Cooling[kWh]` |
+| `img` | Image path | `img`, `img:perspective` |
+| `threeD` | 3D model (glTF/STL/OBJ) | `threeD` |
 
-Units in `[brackets]` are extracted and displayed automatically.
+## Commands
 
-## Getting Started
-
-```bash
-# Install dependencies
-npm install
-
-# Start dev server
-npm run dev
-
-# Build for production
-npm run build
-
-# Run tests
-npm test
-
-# Type check
-npm run check
-```
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Dev server |
+| `npm run build` | Production build |
+| `npm test` | Unit tests |
+| `npm run check` | Type check |
 
 ## Tech Stack
 
-- **Svelte 5** + TypeScript
-- **Vite** for builds
-- **D3 v7** for parallel coordinates and scatter plots
-- **Three.js** for 3D model viewing
-- **Tailwind CSS 4** for styling
-- **Vitest** for unit tests
-- **GitHub Actions** for CI/CD and GitHub Pages deployment
-
-## Deployment
-
-Pushes to `main` automatically build and deploy to GitHub Pages via the `.github/workflows/deploy.yml` workflow.
+Svelte 5 &bull; TypeScript &bull; D3 v7 &bull; Three.js &bull; Tailwind CSS 4 &bull; Vite
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
-
-Built by the [Sustainable Urban Systems Lab](https://www.sus-lab.com).
+MIT &mdash; [Sustainable Urban Systems Lab](https://www.sus-lab.com)
