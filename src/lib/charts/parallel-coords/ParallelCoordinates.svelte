@@ -1,14 +1,26 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import { dataset } from '../../stores/dataset.svelte';
   import { selection } from '../../stores/selection.svelte';
-  import { renderParallelCoords } from './parallel-coords';
+  import {
+    setupParallelCoords,
+    drawLines,
+    updateLabelColors,
+    type ParallelCoordsState,
+  } from './parallel-coords';
   import { createColorScale } from '../shared/color-scale';
   import type { ColorScale } from '../shared/color-scale';
 
   let svgEl: SVGSVGElement;
   let canvasEl: HTMLCanvasElement;
   let containerEl: HTMLDivElement;
+
+  /** Persistent chart state (axes, scales) — survives line redraws */
+  let pcState = $state<ParallelCoordsState | null>(null);
+
+  /** Track container size to detect real resizes vs. canvas-triggered ones */
+  let lastContainerWidth = 0;
+  let lastContainerHeight = 0;
 
   function getColorScale(): ColorScale | null {
     if (!selection.colorDimension) return null;
@@ -19,38 +31,79 @@
     return createColorScale(col, dataset.rows);
   }
 
-  function draw() {
+  /**
+   * Full setup: rebuild SVG axes/brushes.
+   */
+  function setup() {
     if (!svgEl || !canvasEl || !dataset.isLoaded) return;
 
-    const dimensions = dataset.numericColumns;
-    renderParallelCoords(svgEl, canvasEl, {
-      dimensions,
+    pcState = setupParallelCoords(svgEl, canvasEl, {
+      dimensions: dataset.numericColumns,
       rows: dataset.rows,
-      brushedIndices: selection.brushedIndices,
-      highlighted: selection.highlighted,
-      colorScale: getColorScale(),
       onBrush: (column, extent) => selection.setBrush(column, extent),
       onDimensionClick: (column) => selection.setColorDimension(column),
       onHighlight: (row) => selection.highlight(row),
     });
+
+    if (pcState) {
+      lastContainerWidth = pcState.width;
+      lastContainerHeight = pcState.height;
+    }
+  }
+
+  /**
+   * Canvas-only redraw (preserves SVG brush state).
+   */
+  function redrawLines() {
+    if (!canvasEl || !pcState) return;
+
+    const rows = untrack(() => dataset.rows);
+
+    drawLines(canvasEl, pcState, {
+      rows,
+      brushedIndices: selection.brushedIndices,
+      highlighted: selection.highlighted,
+      colorScale: untrack(() => getColorScale()),
+    });
   }
 
   onMount(() => {
-    const observer = new ResizeObserver(() => draw());
+    const observer = new ResizeObserver(() => {
+      if (!containerEl) return;
+      const w = containerEl.clientWidth;
+      const h = containerEl.clientHeight;
+
+      // Only rebuild axes if the container actually resized
+      if (w !== lastContainerWidth || h !== lastContainerHeight) {
+        lastContainerWidth = w;
+        lastContainerHeight = h;
+        setup();
+        untrack(() => redrawLines());
+      }
+    });
     observer.observe(containerEl);
     return () => observer.disconnect();
   });
 
-  // Reactively redraw when data or selection changes
+  // Full setup when dataset changes
   $effect(() => {
-    // Touch reactive dependencies
     dataset.rows;
     dataset.columns;
-    selection.brushedIndices;
+
+    setup();
+    untrack(() => redrawLines());
+  });
+
+  // Canvas-only redraw when selection changes
+  $effect(() => {
+    selection.brushes;
     selection.highlighted;
     selection.colorDimension;
 
-    draw();
+    redrawLines();
+    if (svgEl) {
+      untrack(() => updateLabelColors(svgEl, selection.colorDimension));
+    }
   });
 </script>
 

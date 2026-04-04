@@ -8,6 +8,7 @@
   import { dataset } from '../stores/dataset.svelte';
   import { selection } from '../stores/selection.svelte';
   import { detectModelFormat } from '../types/data';
+  import { loadSpectaclesModel } from './spectacles-loader';
 
   let containerEl: HTMLDivElement;
   let renderer: THREE.WebGLRenderer | null = null;
@@ -131,6 +132,8 @@
       } else if (format === 'obj') {
         const loader = new OBJLoader();
         object = await loader.loadAsync(url);
+      } else if (format === 'json') {
+        object = await loadSpectaclesModel(url);
       } else {
         console.warn(`Unsupported 3D format: ${url}`);
         return;

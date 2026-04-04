@@ -46,7 +46,7 @@ input[type='range']::-webkit-slider-thumb {
 }
 
 /* D3 brush styling — high visibility selection rectangle */
-.brush .selection {
+.pc-brush .selection {
   fill: #f97316;
   fill-opacity: 0.35;
   stroke: #ea580c;
@@ -55,12 +55,12 @@ input[type='range']::-webkit-slider-thumb {
   ry: 3px;
 }
 
-.brush .handle {
+.pc-brush .handle {
   fill: #ea580c;
   width: 8px;
 }
 
-.brush .overlay {
+.pc-brush .overlay {
   cursor: crosshair;
 }
 

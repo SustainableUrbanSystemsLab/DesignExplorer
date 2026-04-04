@@ -53,7 +53,7 @@ export interface DatasetState {
 }
 
 /** Supported 3D model formats */
-export type ModelFormat = 'gltf' | 'glb' | 'stl' | 'obj';
+export type ModelFormat = 'gltf' | 'glb' | 'stl' | 'obj' | 'json';
 
 /** Detect model format from filename */
 export function detectModelFormat(filename: string): ModelFormat | null {
@@ -67,6 +67,8 @@ export function detectModelFormat(filename: string): ModelFormat | null {
       return 'stl';
     case 'obj':
       return 'obj';
+    case 'json':
+      return 'json';
     default:
       return null;
   }
