@@ -11,19 +11,29 @@
   import { createColorScale } from '../shared/color-scale';
   import type { ColorScale } from '../shared/color-scale';
 
+  /** Outer scrollable container */
+  let outerEl: HTMLDivElement;
+  /** Inner chart div — sized to at least minChartWidth */
+  let innerEl: HTMLDivElement;
   let svgEl: SVGSVGElement;
   let canvasEl: HTMLCanvasElement;
-  let containerEl: HTMLDivElement;
 
   /**
-   * Persistent chart state (axes, scales) — NOT reactive ($state) to avoid
-   * triggering effect cascades. Only mutated by setup(), read by redrawLines().
+   * Persistent chart state — NOT $state to avoid reactive cascades.
    */
   let pcState: ParallelCoordsState | null = null;
 
-  /** Track container size to detect real resizes vs. canvas-triggered ones */
-  let lastContainerWidth = 0;
-  let lastContainerHeight = 0;
+  /** Track rendered SVG size to guard against spurious ResizeObserver fires */
+  let lastSvgWidth = 0;
+  let lastSvgHeight = 0;
+
+  /** Minimum pixels per axis — drives horizontal scroll when needed */
+  const MIN_AXIS_PX = 110;
+
+  /** Reactive minimum chart width based on number of axes */
+  let minChartWidth = $derived(
+    Math.max(MIN_AXIS_PX * 2, dataset.numericColumns.length * MIN_AXIS_PX)
+  );
 
   function getColorScale(): ColorScale | null {
     if (!selection.colorDimension) return null;
@@ -34,9 +44,6 @@
     return createColorScale(col, dataset.rows);
   }
 
-  /**
-   * Full setup: rebuild SVG axes/brushes.
-   */
   function setup() {
     if (!svgEl || !canvasEl || !dataset.isLoaded) return;
 
@@ -49,17 +56,13 @@
     });
 
     if (pcState) {
-      lastContainerWidth = pcState.width;
-      lastContainerHeight = pcState.height;
+      lastSvgWidth = pcState.width;
+      lastSvgHeight = pcState.height;
     }
   }
 
-  /**
-   * Canvas-only redraw (preserves SVG brush state).
-   */
   function redrawLines() {
     if (!canvasEl || !pcState) return;
-
     drawLines(canvasEl, pcState, {
       rows: dataset.rows,
       brushedIndices: selection.brushedIndices,
@@ -69,32 +72,28 @@
   }
 
   onMount(() => {
+    // Watch outer container; rebuild when the SVG's actual rendered size changes
     const observer = new ResizeObserver(() => {
-      if (!containerEl) return;
-      const w = containerEl.clientWidth;
-      const h = containerEl.clientHeight;
-
-      // Only rebuild axes if the container actually resized
-      if (w !== lastContainerWidth || h !== lastContainerHeight) {
-        lastContainerWidth = w;
-        lastContainerHeight = h;
+      if (!svgEl) return;
+      const w = svgEl.clientWidth;
+      const h = svgEl.clientHeight;
+      if (w !== lastSvgWidth || h !== lastSvgHeight) {
+        lastSvgWidth = w;
+        lastSvgHeight = h;
         untrack(() => {
           setup();
           redrawLines();
         });
       }
     });
-    observer.observe(containerEl);
+    observer.observe(outerEl);
     return () => observer.disconnect();
   });
 
-  // Full setup when dataset changes
+  // Full setup when dataset changes (also fires on first load)
   $effect(() => {
-    // Track dataset identity
     dataset.rows;
     dataset.columns;
-
-    // Run setup and redraw without tracking internal reads
     untrack(() => {
       setup();
       redrawLines();
@@ -103,33 +102,30 @@
 
   // Canvas-only redraw when selection changes
   $effect(() => {
-    // Track selection properties
     selection.brushes;
     selection.highlighted;
     selection.colorDimension;
-
-    // Redraw without tracking dataset.rows (already handled by the effect above)
     untrack(() => {
       redrawLines();
-      if (svgEl) {
-        updateLabelColors(svgEl, selection.colorDimension);
-      }
+      if (svgEl) updateLabelColors(svgEl, selection.colorDimension);
     });
   });
 </script>
 
-<div bind:this={containerEl} class="relative w-full h-full min-h-[200px]">
-  <canvas
-    bind:this={canvasEl}
-    class="absolute inset-0 w-full h-full"
-  ></canvas>
-  <svg
-    bind:this={svgEl}
-    class="absolute inset-0 w-full h-full"
-  ></svg>
-  {#if !dataset.isLoaded}
-    <div class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
-      Load a dataset to see parallel coordinates
-    </div>
-  {/if}
+<!-- Outer: scrollable horizontally, fills its grid cell -->
+<div bind:this={outerEl} class="w-full h-full overflow-x-auto min-h-[200px]">
+  <!-- Inner: expands to minChartWidth, canvas+svg overlay -->
+  <div
+    bind:this={innerEl}
+    class="relative h-full"
+    style="min-width: {minChartWidth}px; width: 100%;"
+  >
+    <canvas bind:this={canvasEl} class="absolute inset-0 w-full h-full"></canvas>
+    <svg bind:this={svgEl} class="absolute inset-0 w-full h-full"></svg>
+    {#if !dataset.isLoaded}
+      <div class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
+        Load a dataset to see parallel coordinates
+      </div>
+    {/if}
+  </div>
 </div>

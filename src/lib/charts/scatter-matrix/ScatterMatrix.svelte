@@ -9,8 +9,22 @@
   let svgEl: SVGSVGElement;
   let containerEl: HTMLDivElement;
 
-  /** Which columns to show in the scatter matrix */
+  /** Which columns to show in the scatter matrix (originalName keys) */
   let selectedDimensions = $state<string[]>([]);
+
+  /**
+   * Default selection: prefer output columns; if none, use first 5 numeric.
+   * Capped at 5 to keep cells readable.
+   */
+  const MAX_DEFAULT = 5;
+
+  $effect(() => {
+    // Only auto-select on first dataset load (when nothing is selected yet)
+    if (selectedDimensions.length > 0) return;
+    const outputs = dataset.outputColumns.filter((c) => c.isNumeric);
+    const candidates = outputs.length >= 2 ? outputs : dataset.numericColumns;
+    selectedDimensions = candidates.slice(0, MAX_DEFAULT).map((c) => c.originalName);
+  });
 
   function getColorScale(): ColorScale | null {
     if (!selection.colorDimension) return null;
@@ -28,7 +42,7 @@
     const dims =
       selectedDimensions.length > 0
         ? allNumeric.filter((c) => selectedDimensions.includes(c.originalName))
-        : allNumeric.slice(0, 6);
+        : allNumeric.slice(0, MAX_DEFAULT);
 
     renderScatterMatrix(svgEl, {
       dimensions: dims,
@@ -66,24 +80,26 @@
 </script>
 
 <div bind:this={containerEl} class="flex flex-col w-full h-full min-h-[200px]">
-  <!-- Dimension selector -->
+  <!-- Dimension selector — fixed max height with scroll to not crush the chart -->
   {#if dataset.isLoaded}
-    <div class="flex flex-wrap gap-1 p-2 border-b border-gray-200 bg-gray-50 overflow-x-auto">
-      {#each dataset.numericColumns as col}
-        <button
-          class="px-2 py-0.5 text-xs rounded-full border transition-colors
-            {selectedDimensions.includes(col.originalName) || selectedDimensions.length === 0
-              ? 'bg-blue-100 border-blue-300 text-blue-800'
-              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-100'}"
-          onclick={() => toggleDimension(col.originalName)}
-        >
-          {col.displayName}
-        </button>
-      {/each}
+    <div class="flex-shrink-0 max-h-[56px] overflow-y-auto border-b border-gray-200 bg-gray-50 px-2 py-1.5">
+      <div class="flex flex-wrap gap-1">
+        {#each dataset.numericColumns as col}
+          <button
+            class="px-2 py-0.5 text-xs rounded-full border transition-colors whitespace-nowrap
+              {selectedDimensions.includes(col.originalName)
+                ? 'bg-blue-100 border-blue-300 text-blue-800'
+                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-100'}"
+            onclick={() => toggleDimension(col.originalName)}
+          >
+            {col.displayName}
+          </button>
+        {/each}
+      </div>
     </div>
   {/if}
 
-  <div class="flex-1 relative">
+  <div class="flex-1 relative min-h-0">
     <svg bind:this={svgEl} class="w-full h-full"></svg>
     {#if !dataset.isLoaded}
       <div class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
