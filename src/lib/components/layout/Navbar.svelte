@@ -123,6 +123,7 @@
         / {dataset.rows.length} designs
       </span>
     {/if}
+    <span class="text-[10px] text-gray-300 font-mono">v{__APP_VERSION__}</span>
     <a
       href="https://github.com/SustainableUrbanSystemsLab/DesignExplorer"
       target="_blank"
