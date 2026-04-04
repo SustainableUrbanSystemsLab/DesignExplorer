@@ -15,8 +15,11 @@
   let canvasEl: HTMLCanvasElement;
   let containerEl: HTMLDivElement;
 
-  /** Persistent chart state (axes, scales) — survives line redraws */
-  let pcState = $state<ParallelCoordsState | null>(null);
+  /**
+   * Persistent chart state (axes, scales) — NOT reactive ($state) to avoid
+   * triggering effect cascades. Only mutated by setup(), read by redrawLines().
+   */
+  let pcState: ParallelCoordsState | null = null;
 
   /** Track container size to detect real resizes vs. canvas-triggered ones */
   let lastContainerWidth = 0;
@@ -57,13 +60,11 @@
   function redrawLines() {
     if (!canvasEl || !pcState) return;
 
-    const rows = untrack(() => dataset.rows);
-
     drawLines(canvasEl, pcState, {
-      rows,
+      rows: dataset.rows,
       brushedIndices: selection.brushedIndices,
       highlighted: selection.highlighted,
-      colorScale: untrack(() => getColorScale()),
+      colorScale: getColorScale(),
     });
   }
 
@@ -77,8 +78,10 @@
       if (w !== lastContainerWidth || h !== lastContainerHeight) {
         lastContainerWidth = w;
         lastContainerHeight = h;
-        setup();
-        untrack(() => redrawLines());
+        untrack(() => {
+          setup();
+          redrawLines();
+        });
       }
     });
     observer.observe(containerEl);
@@ -87,23 +90,31 @@
 
   // Full setup when dataset changes
   $effect(() => {
+    // Track dataset identity
     dataset.rows;
     dataset.columns;
 
-    setup();
-    untrack(() => redrawLines());
+    // Run setup and redraw without tracking internal reads
+    untrack(() => {
+      setup();
+      redrawLines();
+    });
   });
 
   // Canvas-only redraw when selection changes
   $effect(() => {
+    // Track selection properties
     selection.brushes;
     selection.highlighted;
     selection.colorDimension;
 
-    redrawLines();
-    if (svgEl) {
-      untrack(() => updateLabelColors(svgEl, selection.colorDimension));
-    }
+    // Redraw without tracking dataset.rows (already handled by the effect above)
+    untrack(() => {
+      redrawLines();
+      if (svgEl) {
+        updateLabelColors(svgEl, selection.colorDimension);
+      }
+    });
   });
 </script>
 
