@@ -139,7 +139,7 @@
         return;
       }
 
-      // Center and scale the model
+      // Scale and position the model so it sits on the grid (y=0)
       const box = new THREE.Box3().setFromObject(object);
       const center = box.getCenter(new THREE.Vector3());
       const size = box.getSize(new THREE.Vector3());
@@ -147,14 +147,24 @@
       const scale = 5 / maxDim;
 
       object.scale.setScalar(scale);
-      object.position.sub(center.multiplyScalar(scale));
+      // Recompute bounding box after scaling
+      const scaledBox = new THREE.Box3().setFromObject(object);
+      const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
+      // Center horizontally (X/Z) but place bottom on grid (Y=0)
+      object.position.set(
+        -scaledCenter.x,
+        -scaledBox.min.y,
+        -scaledCenter.z
+      );
 
       scene.add(object);
       currentModel = object;
 
-      // Adjust camera
+      // Adjust camera to look at model center
+      const finalBox = new THREE.Box3().setFromObject(object);
+      const finalCenter = finalBox.getCenter(new THREE.Vector3());
       camera.position.set(5, 5, 5);
-      controls.target.set(0, 0, 0);
+      controls.target.copy(finalCenter);
       controls.update();
     } catch (error) {
       console.error('Failed to load 3D model:', error);

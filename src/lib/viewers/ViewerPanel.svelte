@@ -46,7 +46,7 @@
   });
 </script>
 
-<div class="w-full h-full flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden">
+<div class="w-full h-full flex flex-col bg-white overflow-hidden">
   <!-- Header with mode toggle and favorite button -->
   <div class="flex items-center justify-between px-3 py-1.5 bg-gray-50 border-b border-gray-200">
     <div class="flex items-center gap-1">
