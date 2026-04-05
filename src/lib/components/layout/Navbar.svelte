@@ -49,6 +49,15 @@
     dataset.excludeRows(brushed);
     selection.clearBrushes();
   }
+
+  let copyLinkLabel = $state('Copy Link');
+
+  function handleCopyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      copyLinkLabel = 'Copied!';
+      setTimeout(() => (copyLinkLabel = 'Copy Link'), 2000);
+    });
+  }
 </script>
 
 <nav class="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200 shadow-sm">
@@ -112,6 +121,17 @@
       >
         Export CSV
       </button>
+
+      {#if dataset.source?.type === 'url'}
+        <div class="w-px h-5 bg-gray-200 mx-1"></div>
+        <button
+          onclick={handleCopyLink}
+          class="px-2.5 py-1.5 text-xs text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+          title="Copy shareable link to this dataset"
+        >
+          {copyLinkLabel}
+        </button>
+      {/if}
     {/if}
   </div>
 
