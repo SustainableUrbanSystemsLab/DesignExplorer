@@ -134,20 +134,22 @@
             >
               Load a Dataset
             </button>
-            <a
-              href="https://github.com/kastnerp"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 mt-8 px-3 py-1.5 rounded-full border border-gray-200
-                hover:border-gray-300 hover:bg-gray-50 transition-colors text-gray-600 hover:text-gray-900"
-            >
-              <img
-                src="https://github.com/kastnerp.png"
-                alt="kastnerp"
-                class="w-6 h-6 rounded-full"
-              />
-              <span class="text-xs font-medium">kastnerp</span>
-            </a>
+            <div class="mt-8 flex justify-center">
+              <a
+                href="https://github.com/kastnerp"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200
+                  hover:border-gray-300 hover:bg-gray-50 transition-colors text-gray-600 hover:text-gray-900"
+              >
+                <img
+                  src="https://github.com/kastnerp.png"
+                  alt="kastnerp"
+                  class="w-6 h-6 rounded-full"
+                />
+                <span class="text-xs font-medium">kastnerp</span>
+              </a>
+            </div>
           </div>
         </div>
       {/if}
