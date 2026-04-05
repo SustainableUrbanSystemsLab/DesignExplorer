@@ -8,6 +8,8 @@
 
   let { onLoadData }: Props = $props();
 
+  let linkCopied = $state(false);
+
   function handleReset() {
     dataset.reset();
     selection.clearBrushes();
@@ -50,14 +52,36 @@
     selection.clearBrushes();
   }
 
-  let copyLinkLabel = $state('Copy Link');
+  /** Build a shareable deep link and copy to clipboard. */
+  async function handleCopyLink() {
+    const params = new URLSearchParams(window.location.search);
+    const csvUrl = params.get('url');
+    if (!csvUrl) return;
 
-  function handleCopyLink() {
-    navigator.clipboard.writeText(window.location.href).then(() => {
-      copyLinkLabel = 'Copied!';
-      setTimeout(() => (copyLinkLabel = 'Copy Link'), 2000);
-    });
+    const deepLink = `${window.location.origin}${window.location.pathname}?url=${encodeURIComponent(csvUrl)}`;
+
+    try {
+      await navigator.clipboard.writeText(deepLink);
+      linkCopied = true;
+      setTimeout(() => (linkCopied = false), 2000);
+    } catch {
+      // Fallback for insecure contexts
+      const input = document.createElement('input');
+      input.value = deepLink;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      linkCopied = true;
+      setTimeout(() => (linkCopied = false), 2000);
+    }
   }
+
+  /** Whether the current dataset was loaded from a URL (shareable). */
+  let hasShareableUrl = $derived(
+    dataset.isLoaded && dataset.source?.type === 'url' &&
+    new URLSearchParams(window.location.search).has('url')
+  );
 </script>
 
 <nav class="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200 shadow-sm">
@@ -67,7 +91,7 @@
       Design Explorer
     </h1>
     {#if dataset.isLoaded}
-      <span class="text-xs text-gray-400 hidden sm:inline">
+      <span class="text-xs text-gray-400 hidden sm:inline truncate max-w-[200px]">
         {dataset.source?.name ?? 'Untitled Study'}
       </span>
     {/if}
@@ -122,14 +146,16 @@
         Export CSV
       </button>
 
-      {#if dataset.source?.type === 'url'}
-        <div class="w-px h-5 bg-gray-200 mx-1"></div>
+      {#if hasShareableUrl}
         <button
           onclick={handleCopyLink}
-          class="px-2.5 py-1.5 text-xs text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
-          title="Copy shareable link to this dataset"
+          class="px-2.5 py-1.5 text-xs rounded-lg transition-colors
+            {linkCopied
+              ? 'bg-green-100 text-green-700'
+              : 'text-gray-600 hover:bg-gray-100'}"
+          title="Copy shareable link to clipboard"
         >
-          {copyLinkLabel}
+          {linkCopied ? 'Copied!' : 'Copy Link'}
         </button>
       {/if}
     {/if}

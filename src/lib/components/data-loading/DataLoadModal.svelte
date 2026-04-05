@@ -23,13 +23,13 @@
     error = '';
 
     try {
-      const { csvText, baseUrl } = await loadFromUrl(urlInput.trim());
+      const { csvText, baseUrl, resolvedUrl } = await loadFromUrl(urlInput.trim());
       dataset.load(csvText, { type: 'url', name: urlInput.trim(), baseUrl });
       favorites.init(dataset.studyId);
 
-      // Update browser URL for sharing
+      // Update browser URL for sharing (use resolved URL so the link works)
       const params = new URLSearchParams(window.location.search);
-      params.set('url', urlInput.trim());
+      params.set('url', resolvedUrl);
       const newUrl = `${window.location.pathname}?${params.toString()}`;
       window.history.replaceState(null, '', newUrl);
 
