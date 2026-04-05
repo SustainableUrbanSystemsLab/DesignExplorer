@@ -16,6 +16,7 @@
   let dragOver = $state(false);
   let loading = $state(false);
   let error = $state('');
+  let showHelp = $state(false);
 
   async function handleUrl() {
     if (!urlInput.trim()) return;
@@ -100,7 +101,7 @@
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
     onclick={(e) => { if (e.target === e.currentTarget) onclose(); }}
   >
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
       <!-- Header -->
       <div class="px-6 py-4 border-b border-gray-200">
         <h2 class="text-lg font-semibold text-gray-900">Load Design Study</h2>
@@ -205,6 +206,82 @@
           >
             Red Box Parametric Study (125 designs)
           </button>
+        </div>
+
+        <!-- CSV format help -->
+        <div class="mt-4 pt-4 border-t border-gray-200">
+          <button
+            onclick={() => (showHelp = !showHelp)}
+            class="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
+          >
+            <span class="inline-block transition-transform {showHelp ? 'rotate-90' : ''}"
+              style="font-size: 10px;">&#9654;</span>
+            How to prepare your CSV
+          </button>
+
+          {#if showHelp}
+            <div class="mt-3 text-xs text-gray-600 space-y-3">
+              <p>
+                Each row represents one design iteration. Use column name prefixes to
+                tell Design Explorer how to interpret your data:
+              </p>
+
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-gray-200">
+                    <th class="py-1 pr-3 font-semibold text-gray-700">Prefix</th>
+                    <th class="py-1 font-semibold text-gray-700">Meaning</th>
+                  </tr>
+                </thead>
+                <tbody class="font-mono">
+                  <tr class="border-b border-gray-100">
+                    <td class="py-1 pr-3 text-blue-600">in:</td>
+                    <td class="font-sans">Input parameter (e.g. <code class="bg-gray-100 px-1 rounded">in:Width</code>)</td>
+                  </tr>
+                  <tr class="border-b border-gray-100">
+                    <td class="py-1 pr-3 text-green-600">out:</td>
+                    <td class="font-sans">Output metric (e.g. <code class="bg-gray-100 px-1 rounded">out:Energy</code>)</td>
+                  </tr>
+                  <tr class="border-b border-gray-100">
+                    <td class="py-1 pr-3 text-purple-600">img</td>
+                    <td class="font-sans">Image path (e.g. <code class="bg-gray-100 px-1 rounded">img:Perspective</code>)</td>
+                  </tr>
+                  <tr>
+                    <td class="py-1 pr-3 text-orange-600">threeD</td>
+                    <td class="font-sans">3D model path (e.g. <code class="bg-gray-100 px-1 rounded">threeD:Model</code>)</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="space-y-1.5">
+                <p>
+                  <strong class="text-gray-700">Units</strong> &mdash; Add units in square brackets:
+                  <code class="bg-gray-100 px-1 rounded">in:Width[m]</code>,
+                  <code class="bg-gray-100 px-1 rounded">out:Cooling[kWh]</code>
+                </p>
+                <p>
+                  <strong class="text-gray-700">Images</strong> &mdash; Values can be relative paths
+                  (resolved from the CSV location) or full URLs. Supported formats: PNG, JPG, SVG, WebP.
+                </p>
+                <p>
+                  <strong class="text-gray-700">3D Models</strong> &mdash; Supported formats: glTF, GLB, STL, OBJ,
+                  and Spectacles JSON (from Grasshopper).
+                </p>
+                <p>
+                  <strong class="text-gray-700">No prefix?</strong> &mdash; Columns without a recognized prefix
+                  are treated as general numeric data and appear in the parallel coordinates chart.
+                </p>
+              </div>
+
+              <div class="bg-gray-50 rounded-lg p-3 overflow-x-auto">
+                <p class="font-semibold text-gray-700 mb-1.5">Example CSV:</p>
+                <pre class="text-[11px] leading-relaxed text-gray-600 whitespace-pre">in:Width[m],in:Height[m],out:Area[m2],out:Energy[kWh],img:Render,threeD:Model
+5,3,15,120,renders/001.png,models/001.glb
+8,4,32,210,renders/002.png,models/002.glb
+10,3,30,180,renders/003.png,models/003.glb</pre>
+              </div>
+            </div>
+          {/if}
         </div>
       </div>
     </div>
