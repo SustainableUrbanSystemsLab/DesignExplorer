@@ -134,7 +134,7 @@
             >
               Load a Dataset
             </button>
-            <div class="mt-8 flex justify-center">
+            <div class="mt-8">
               <a
                 href="https://github.com/kastnerp"
                 target="_blank"

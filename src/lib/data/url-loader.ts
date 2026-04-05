@@ -1,20 +1,92 @@
 /**
- * Load CSV text from a URL.
- * Resolves the base URL for relative image/3D paths.
+ * Normalize cloud-storage URLs to CORS-friendly direct-download variants.
+ *
+ * Supported providers:
+ * - Dropbox: www.dropbox.com → dl.dropboxusercontent.com (CORS: *)
+ * - Google Drive: drive.google.com share links → direct export URL
  */
-export async function loadFromUrl(url: string): Promise<{ csvText: string; baseUrl: string }> {
-  const response = await fetch(url);
+export function normalizeCloudUrl(raw: string): string {
+  const url = raw.trim();
 
-  if (!response.ok) {
-    throw new Error(`Failed to load CSV: ${response.status} ${response.statusText}`);
+  // --- Dropbox ---
+  // https://www.dropbox.com/scl/fi/{id}/{file}?rlkey=...&dl=1
+  // https://www.dropbox.com/s/{id}/{file}?dl=1
+  // → https://dl.dropboxusercontent.com/scl/fi/{id}/{file}?rlkey=...
+  if (/^https?:\/\/(www\.)?dropbox\.com\//i.test(url)) {
+    const u = new URL(url);
+    u.hostname = 'dl.dropboxusercontent.com';
+    u.searchParams.delete('dl'); // dl param not needed for direct download
+    return u.toString();
   }
 
-  const csvText = await response.text();
+  // --- Google Drive ---
+  // https://drive.google.com/file/d/{id}/view?...
+  // https://drive.google.com/open?id={id}
+  const gdriveFileMatch = url.match(
+    /^https?:\/\/drive\.google\.com\/file\/d\/([^/]+)/i
+  );
+  if (gdriveFileMatch) {
+    return `https://drive.google.com/uc?export=download&id=${gdriveFileMatch[1]}`;
+  }
+  const gdriveOpenMatch = url.match(
+    /^https?:\/\/drive\.google\.com\/open\?.*id=([^&]+)/i
+  );
+  if (gdriveOpenMatch) {
+    return `https://drive.google.com/uc?export=download&id=${gdriveOpenMatch[1]}`;
+  }
 
-  // Base URL is everything before the last slash
-  const baseUrl = url.substring(0, url.lastIndexOf('/') + 1);
+  return url;
+}
 
-  return { csvText, baseUrl };
+/** Public CORS proxies tried in order when a direct fetch is blocked. */
+const CORS_PROXIES = [
+  (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+];
+
+/**
+ * Load CSV text from a URL.
+ *
+ * 1. Cloud-storage URLs (Dropbox, Google Drive) are normalised first.
+ * 2. A direct `fetch` is attempted.
+ * 3. If the direct fetch fails (typically CORS), public CORS proxies are
+ *    tried as a fallback so users can paste *any* hosted CSV link.
+ */
+export async function loadFromUrl(
+  rawUrl: string
+): Promise<{ csvText: string; baseUrl: string; resolvedUrl: string }> {
+  const resolvedUrl = normalizeCloudUrl(rawUrl);
+
+  // --- Try direct fetch first ---
+  try {
+    const response = await fetch(resolvedUrl);
+    if (response.ok) {
+      const csvText = await response.text();
+      const baseUrl = resolvedUrl.substring(0, resolvedUrl.lastIndexOf('/') + 1);
+      return { csvText, baseUrl, resolvedUrl };
+    }
+  } catch {
+    // Likely a CORS TypeError — fall through to proxy attempts
+  }
+
+  // --- Try CORS proxies ---
+  for (const buildProxyUrl of CORS_PROXIES) {
+    try {
+      const proxyUrl = buildProxyUrl(resolvedUrl);
+      const response = await fetch(proxyUrl);
+      if (response.ok) {
+        const csvText = await response.text();
+        // Base URL uses the *original* resolved URL (not the proxy) so
+        // relative image paths resolve to the real server.
+        const baseUrl = resolvedUrl.substring(0, resolvedUrl.lastIndexOf('/') + 1);
+        return { csvText, baseUrl, resolvedUrl };
+      }
+    } catch {
+      // Try next proxy
+    }
+  }
+
+  throw new Error('Failed to fetch CSV. The server may not allow cross-origin requests.');
 }
 
 /**
