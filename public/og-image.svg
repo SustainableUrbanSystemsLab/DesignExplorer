@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0f172a"/>
+
+  <!-- Decorative parallel-coords lines -->
+  <g stroke="#3b82f6" stroke-width="1.5" opacity="0.25">
+    <polyline fill="none" points="100,180 300,240 500,160 700,300 900,200 1100,250"/>
+    <polyline fill="none" points="100,220 300,180 500,280 700,200 900,320 1100,190"/>
+    <polyline fill="none" points="100,260 300,320 500,200 700,260 900,160 1100,310"/>
+    <polyline fill="none" points="100,300 300,260 500,340 700,180 900,280 1100,160"/>
+    <polyline fill="none" points="100,340 300,200 500,260 700,340 900,240 1100,290"/>
+    <polyline fill="none" points="100,200 300,340 500,220 700,280 900,360 1100,220"/>
+    <polyline fill="none" points="100,380 300,160 500,300 700,220 900,180 1100,340"/>
+  </g>
+  <g stroke="#60a5fa" stroke-width="2" opacity="0.5">
+    <polyline fill="none" points="100,240 300,200 500,280 700,160 900,300 1100,200"/>
+    <polyline fill="none" points="100,320 300,280 500,180 700,320 900,220 1100,270"/>
+  </g>
+
+  <!-- Axis lines -->
+  <g stroke="#475569" stroke-width="1.5">
+    <line x1="100" y1="140" x2="100" y2="420"/>
+    <line x1="300" y1="140" x2="300" y2="420"/>
+    <line x1="500" y1="140" x2="500" y2="420"/>
+    <line x1="700" y1="140" x2="700" y2="420"/>
+    <line x1="900" y1="140" x2="900" y2="420"/>
+    <line x1="1100" y1="140" x2="1100" y2="420"/>
+  </g>
+
+  <!-- Scatter dots (bottom-right suggestion) -->
+  <g fill="#f59e0b" opacity="0.4">
+    <circle cx="950" cy="490" r="4"/>
+    <circle cx="970" cy="510" r="5"/>
+    <circle cx="1000" cy="480" r="3"/>
+    <circle cx="1020" cy="520" r="4"/>
+    <circle cx="1040" cy="495" r="6"/>
+    <circle cx="1060" cy="505" r="3"/>
+    <circle cx="1080" cy="485" r="5"/>
+  </g>
+
+  <!-- Title -->
+  <text x="600" y="530" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="700" fill="#f8fafc" text-anchor="middle">Design Explorer</text>
+  <text x="600" y="585" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="400" fill="#94a3b8" text-anchor="middle">Parametric Design Space Visualizer</text>
+
+  <!-- Lab attribution -->
+  <text x="600" y="80" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#475569" text-anchor="middle">Sustainable Urban Systems Lab</text>
+</svg>
