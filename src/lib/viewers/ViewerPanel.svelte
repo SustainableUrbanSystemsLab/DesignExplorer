@@ -49,21 +49,27 @@
 <div class="w-full h-full flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden">
   <!-- Header with mode toggle and favorite button -->
   <div class="flex items-center justify-between px-3 py-1.5 bg-gray-50 border-b border-gray-200">
-    <div class="flex items-center gap-1">
+    <div class="flex items-center gap-1" role="group" aria-label="Viewer mode">
       {#if hasImages}
         <button
-          class="px-2 py-0.5 text-xs rounded transition-colors
-            {viewMode === '2d' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}"
+          class="px-2 py-0.5 text-xs rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500
+            {viewMode === '2d'
+            ? 'bg-white shadow text-gray-900'
+            : 'text-gray-500 hover:text-gray-700'}"
           onclick={() => (viewMode = '2d')}
+          aria-pressed={viewMode === '2d'}
         >
           2D
         </button>
       {/if}
       {#if has3D}
         <button
-          class="px-2 py-0.5 text-xs rounded transition-colors
-            {viewMode === '3d' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}"
+          class="px-2 py-0.5 text-xs rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500
+            {viewMode === '3d'
+            ? 'bg-white shadow text-gray-900'
+            : 'text-gray-500 hover:text-gray-700'}"
           onclick={() => (viewMode = '3d')}
+          aria-pressed={viewMode === '3d'}
         >
           3D
         </button>
@@ -77,13 +83,15 @@
         </span>
         <button
           onclick={toggleFavorite}
-          class="text-lg transition-colors hover:scale-110"
+          class="text-lg transition-colors hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 rounded-full px-1"
           title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+          aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+          aria-pressed={isFavorited}
         >
           {#if isFavorited}
-            <span class="text-red-500">&#9829;</span>
+            <span class="text-red-500" aria-hidden="true">&#9829;</span>
           {:else}
-            <span class="text-gray-400">&#9825;</span>
+            <span class="text-gray-400" aria-hidden="true">&#9825;</span>
           {/if}
         </button>
       {/if}
@@ -106,13 +114,17 @@
         {#each highlightedInfo.inputs as param}
           <span class="whitespace-nowrap">
             <span class="text-blue-600 font-medium">{param.label}:</span>
-            <span class="text-gray-700">{typeof param.value === 'number' ? param.value.toFixed(2) : param.value}</span>
+            <span class="text-gray-700"
+              >{typeof param.value === 'number' ? param.value.toFixed(2) : param.value}</span
+            >
           </span>
         {/each}
         {#each highlightedInfo.outputs as param}
           <span class="whitespace-nowrap">
             <span class="text-emerald-600 font-medium">{param.label}:</span>
-            <span class="text-gray-700">{typeof param.value === 'number' ? param.value.toFixed(2) : param.value}</span>
+            <span class="text-gray-700"
+              >{typeof param.value === 'number' ? param.value.toFixed(2) : param.value}</span
+            >
           </span>
         {/each}
       </div>
