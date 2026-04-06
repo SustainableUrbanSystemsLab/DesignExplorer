@@ -19,28 +19,35 @@
   let sidebarOpen = $state(true);
   let urlLoading = $state(false);
   let urlLoadSource = $state('');
+  let urlLoadError = $state('');
+  let pendingUrl = $state('');
+
+  async function loadUrlDataset(url: string) {
+    urlLoading = true;
+    urlLoadError = '';
+    pendingUrl = url;
+    try {
+      const hostname = new URL(url).hostname;
+      urlLoadSource = hostname;
+    } catch { urlLoadSource = 'remote server'; }
+    try {
+      const { csvText, baseUrl } = await loadFromUrl(url);
+      dataset.load(csvText, { type: 'url', name: url, baseUrl });
+      favorites.init(dataset.studyId);
+    } catch (e) {
+      console.error('Failed to load from URL parameter:', e);
+      urlLoadError = e instanceof Error ? e.message : 'Failed to load dataset';
+    } finally {
+      urlLoading = false;
+    }
+  }
 
   // Check for URL parameter on mount
   onMount(async () => {
     const params = new URLSearchParams(window.location.search);
     const url = params.get('url');
     if (url) {
-      urlLoading = true;
-      // Show a friendly source name
-      try {
-        const hostname = new URL(url).hostname;
-        urlLoadSource = hostname;
-      } catch { urlLoadSource = 'remote server'; }
-      try {
-        const { csvText, baseUrl } = await loadFromUrl(url);
-        dataset.load(csvText, { type: 'url', name: url, baseUrl });
-        favorites.init(dataset.studyId);
-      } catch (e) {
-        console.error('Failed to load from URL parameter:', e);
-        showLoadModal = true;
-      } finally {
-        urlLoading = false;
-      }
+      await loadUrlDataset(url);
     } else {
       showLoadModal = true;
     }
@@ -125,20 +132,40 @@
             <ThumbnailGrid />
           {/if}
         </div>
-      {:else if urlLoading}
-        <!-- Loading state for URL parameter -->
+      {:else if urlLoading || urlLoadError}
+        <!-- Loading / error state for URL parameter -->
         <div class="flex-1 flex items-center justify-center">
           <div class="text-center max-w-sm">
             <div class="text-5xl mb-5">&#128200;</div>
-            <h2 class="text-lg font-semibold text-gray-900 mb-2">Loading Dataset</h2>
-            <p class="text-sm text-gray-500 mb-6">
-              Fetching data from <span class="font-medium text-gray-700">{urlLoadSource}</span>
-            </p>
-            <!-- Progress bar -->
-            <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-              <div class="h-full bg-blue-600 rounded-full animate-loading-bar"></div>
-            </div>
-            <p class="text-xs text-gray-400 mt-3">This may take a few seconds&hellip;</p>
+            {#if urlLoading}
+              <h2 class="text-lg font-semibold text-gray-900 mb-2">Loading Dataset</h2>
+              <p class="text-sm text-gray-500 mb-6">
+                Fetching data from <span class="font-medium text-gray-700">{urlLoadSource}</span>
+              </p>
+              <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                <div class="h-full bg-blue-600 rounded-full animate-loading-bar"></div>
+              </div>
+              <p class="text-xs text-gray-400 mt-3">This may take a few seconds&hellip;</p>
+            {:else}
+              <h2 class="text-lg font-semibold text-gray-900 mb-2">Could not load dataset</h2>
+              <p class="text-sm text-gray-500 mb-4">{urlLoadError}</p>
+              <div class="flex items-center justify-center gap-3">
+                <button
+                  onclick={() => loadUrlDataset(pendingUrl)}
+                  class="px-5 py-2 bg-blue-600 text-white text-sm rounded-lg font-medium
+                    hover:bg-blue-700 transition-colors"
+                >
+                  Retry
+                </button>
+                <button
+                  onclick={() => { urlLoadError = ''; showLoadModal = true; }}
+                  class="px-5 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg font-medium
+                    hover:bg-gray-200 transition-colors"
+                >
+                  Load different file
+                </button>
+              </div>
+            {/if}
           </div>
         </div>
       {:else}
