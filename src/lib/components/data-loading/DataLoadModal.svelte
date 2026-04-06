@@ -186,6 +186,12 @@
             >
               {loading ? 'Loading...' : 'Load Dataset'}
             </button>
+            {#if loading}
+              <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden mt-3">
+                <div class="h-full bg-blue-600 rounded-full animate-loading-bar"></div>
+              </div>
+              <p class="text-xs text-gray-400 mt-1.5 text-center">Fetching dataset&hellip;</p>
+            {/if}
           </div>
         {/if}
 

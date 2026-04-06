@@ -17,12 +17,20 @@
   let showLoadModal = $state(false);
   let showDataTable = $state(false);
   let sidebarOpen = $state(true);
+  let urlLoading = $state(false);
+  let urlLoadSource = $state('');
 
   // Check for URL parameter on mount
   onMount(async () => {
     const params = new URLSearchParams(window.location.search);
     const url = params.get('url');
     if (url) {
+      urlLoading = true;
+      // Show a friendly source name
+      try {
+        const hostname = new URL(url).hostname;
+        urlLoadSource = hostname;
+      } catch { urlLoadSource = 'remote server'; }
       try {
         const { csvText, baseUrl } = await loadFromUrl(url);
         dataset.load(csvText, { type: 'url', name: url, baseUrl });
@@ -30,6 +38,8 @@
       } catch (e) {
         console.error('Failed to load from URL parameter:', e);
         showLoadModal = true;
+      } finally {
+        urlLoading = false;
       }
     } else {
       showLoadModal = true;
@@ -114,6 +124,22 @@
           {:else}
             <ThumbnailGrid />
           {/if}
+        </div>
+      {:else if urlLoading}
+        <!-- Loading state for URL parameter -->
+        <div class="flex-1 flex items-center justify-center">
+          <div class="text-center max-w-sm">
+            <div class="text-5xl mb-5">&#128200;</div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-2">Loading Dataset</h2>
+            <p class="text-sm text-gray-500 mb-6">
+              Fetching data from <span class="font-medium text-gray-700">{urlLoadSource}</span>
+            </p>
+            <!-- Progress bar -->
+            <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+              <div class="h-full bg-blue-600 rounded-full animate-loading-bar"></div>
+            </div>
+            <p class="text-xs text-gray-400 mt-3">This may take a few seconds&hellip;</p>
+          </div>
         </div>
       {:else}
         <!-- Empty state -->
