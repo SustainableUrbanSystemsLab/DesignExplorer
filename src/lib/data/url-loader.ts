@@ -113,9 +113,33 @@ export async function loadFromUrl(
 }
 
 /**
+ * Rewrite GitHub Pages URLs to raw.githubusercontent.com.
+ *
+ * GitHub Pages sites with custom domains can break image serving when the
+ * custom domain is redirected elsewhere. The underlying files are still
+ * accessible via raw.githubusercontent.com.
+ *
+ * Pattern: https://{org}.github.io/{repo}/path/to/file
+ *       → https://raw.githubusercontent.com/{org}/{repo}/gh-pages/path/to/file
+ */
+export function normalizeGitHubPagesUrl(url: string): string {
+  const match = url.match(
+    /^https?:\/\/([^.]+)\.github\.io\/([^/]+)\/(.+)$/i
+  );
+  if (match) {
+    const [, org, repo, path] = match;
+    return `https://raw.githubusercontent.com/${org}/${repo}/gh-pages/${path}`;
+  }
+  return url;
+}
+
+/**
  * Resolve a potentially relative path to an absolute URL.
  * If the path is already absolute (starts with http:// or https://), return as-is.
  * Otherwise, prepend the base URL.
+ *
+ * GitHub Pages URLs are rewritten to raw.githubusercontent.com to avoid
+ * broken custom-domain redirects.
  */
 export function resolveUrl(path: string, baseUrl?: string): string {
   if (!path) return '';
@@ -124,7 +148,7 @@ export function resolveUrl(path: string, baseUrl?: string): string {
 
   // Already absolute
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-    return trimmed;
+    return normalizeGitHubPagesUrl(trimmed);
   }
 
   // Data URL or blob
@@ -134,7 +158,7 @@ export function resolveUrl(path: string, baseUrl?: string): string {
 
   // Relative path — prepend base URL
   if (baseUrl) {
-    return baseUrl + trimmed;
+    return normalizeGitHubPagesUrl(baseUrl + trimmed);
   }
 
   return trimmed;

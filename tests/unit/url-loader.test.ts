@@ -1,8 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { resolveUrl, normalizeCloudUrl } from '../../src/lib/data/url-loader';
+import {
+  resolveUrl,
+  normalizeCloudUrl,
+  normalizeGitHubPagesUrl,
+} from '../../src/lib/data/url-loader';
 
 describe('resolveUrl', () => {
-  it('returns absolute URLs unchanged', () => {
+  it('returns non-GitHub-Pages absolute URLs unchanged', () => {
     const url = 'https://example.com/images/test.png';
     expect(resolveUrl(url)).toBe(url);
   });
@@ -10,6 +14,14 @@ describe('resolveUrl', () => {
   it('returns http URLs unchanged', () => {
     const url = 'http://example.com/images/test.png';
     expect(resolveUrl(url)).toBe(url);
+  });
+
+  it('rewrites GitHub Pages URLs to raw.githubusercontent.com', () => {
+    const url =
+      'https://eddy3d-dev.github.io/Eddy3D-CornellTech-CaseStudy/design_explorer_data/DefaultData/0ScreenParallel.webp';
+    expect(resolveUrl(url)).toBe(
+      'https://raw.githubusercontent.com/eddy3d-dev/Eddy3D-CornellTech-CaseStudy/gh-pages/design_explorer_data/DefaultData/0ScreenParallel.webp',
+    );
   });
 
   it('prepends base URL for relative paths', () => {
@@ -91,5 +103,34 @@ describe('normalizeCloudUrl', () => {
   it('leaves GitHub raw URLs unchanged', () => {
     const raw = 'https://raw.githubusercontent.com/user/repo/main/data.csv';
     expect(normalizeCloudUrl(raw)).toBe(raw);
+  });
+});
+
+describe('normalizeGitHubPagesUrl', () => {
+  it('rewrites github.io URLs to raw.githubusercontent.com', () => {
+    const url =
+      'https://eddy3d-dev.github.io/Eddy3D-CornellTech-CaseStudy/design_explorer_data/DefaultData/0ScreenParallel.webp';
+    expect(normalizeGitHubPagesUrl(url)).toBe(
+      'https://raw.githubusercontent.com/eddy3d-dev/Eddy3D-CornellTech-CaseStudy/gh-pages/design_explorer_data/DefaultData/0ScreenParallel.webp',
+    );
+  });
+
+  it('handles any org/repo combination', () => {
+    expect(
+      normalizeGitHubPagesUrl('https://myorg.github.io/my-repo/assets/img.png'),
+    ).toBe(
+      'https://raw.githubusercontent.com/myorg/my-repo/gh-pages/assets/img.png',
+    );
+  });
+
+  it('leaves non-github.io URLs unchanged', () => {
+    const url = 'https://example.com/images/test.png';
+    expect(normalizeGitHubPagesUrl(url)).toBe(url);
+  });
+
+  it('leaves raw.githubusercontent.com URLs unchanged', () => {
+    const url =
+      'https://raw.githubusercontent.com/user/repo/main/data.csv';
+    expect(normalizeGitHubPagesUrl(url)).toBe(url);
   });
 });
