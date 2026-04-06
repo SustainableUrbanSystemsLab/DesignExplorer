@@ -218,6 +218,8 @@
         <div class="mt-4 pt-4 border-t border-gray-200">
           <button
             onclick={() => (showHelp = !showHelp)}
+            aria-expanded={showHelp}
+            aria-controls="csv-help-content"
             class="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
           >
             <span class="inline-block transition-transform {showHelp ? 'rotate-90' : ''}"
@@ -226,7 +228,7 @@
           </button>
 
           {#if showHelp}
-            <div class="mt-3 text-xs text-gray-600 space-y-3">
+            <div id="csv-help-content" class="mt-3 text-xs text-gray-600 space-y-3">
               <p>
                 Each row represents one design iteration. Use column name prefixes to
                 tell Design Explorer how to interpret your data:
