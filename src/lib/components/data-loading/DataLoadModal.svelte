@@ -94,20 +94,37 @@
   }
 </script>
 
+<svelte:window onkeydown={(e) => { if (e.key === 'Escape' && open) onclose(); }} />
+
 {#if open}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <!-- svelte-ignore a11y_interactive_supports_focus -->
   <div
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
     onclick={(e) => { if (e.target === e.currentTarget) onclose(); }}
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
   >
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
       <!-- Header -->
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-900">Load Design Study</h2>
-        <p class="text-sm text-gray-500 mt-0.5">
-          Upload a CSV file or provide a URL to a hosted dataset
-        </p>
+      <div class="px-6 py-4 border-b border-gray-200 flex items-start justify-between">
+        <div>
+          <h2 id="modal-title" class="text-lg font-semibold text-gray-900">Load Design Study</h2>
+          <p class="text-sm text-gray-500 mt-0.5">
+            Upload a CSV file or provide a URL to a hosted dataset
+          </p>
+        </div>
+        <button
+          onclick={onclose}
+          class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg p-1 transition-colors"
+          aria-label="Close modal"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
       <!-- Tabs -->
@@ -148,12 +165,12 @@
               Drag & drop a <strong>.csv</strong> or <strong>.zip</strong> file here
             </p>
             <p class="text-xs text-gray-400 mb-3">or</p>
-            <label class="inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded-lg cursor-pointer hover:bg-blue-700 transition-colors">
+            <label class="inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded-lg cursor-pointer hover:bg-blue-700 transition-colors focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2">
               Browse Files
               <input
                 type="file"
                 accept=".csv,.zip"
-                class="hidden"
+                class="sr-only"
                 onchange={(e) => handleFiles((e.target as HTMLInputElement).files)}
               />
             </label>
