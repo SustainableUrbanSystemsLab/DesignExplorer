@@ -8,4 +8,9 @@
 
 ## 2024-06-25 - Custom File Input Accessibility and Modal Escapes
 **Learning:** Hidden file inputs (`class="hidden"`) inside stylized labels completely break keyboard navigation, as users cannot tab to the input to trigger the file browser. Additionally, modals without keyboard (Escape) or explicit visual close buttons trap keyboard and screen reader users.
-**Action:** Use `class="sr-only"` instead of `class="hidden"` for custom file inputs, and add `focus-within:ring-2` on the parent label to visibly indicate focus. Always provide `<svelte:window onkeydown={(e) => e.key === 'Escape' && close()} />` and a clearly labeled `aria-label="Close modal"` button in dialog headers.
+**Action:** Use `class="sr-only"` instead of `class="hidden"` for custom file inputs, and add `focus-within:ring-2` on the parent label to visibly indicate focus. Always provide `<svelte:window onkeydown={(e) => e.key === 'Escape' && close()} />` and a clearly labeled `aria-label="Close modal"` button in dialog headers.## 2025-04-09 - Icon-Only Button Accessibility
+**Learning:** Svelte icon-only buttons often lack ARIA attributes, making them invisible to screen readers.
+**Action:** Always ensure ,  (if toggleable), and  ring styling are present for custom buttons using unicode characters or SVGs.
+## 2025-04-09 - Icon-Only Button Accessibility
+**Learning:** Svelte icon-only buttons often lack ARIA attributes, making them invisible to screen readers.
+**Action:** Always ensure `aria-label`, `aria-expanded` (if toggleable), and `focus-visible` ring styling are present for custom buttons using unicode characters or SVGs.

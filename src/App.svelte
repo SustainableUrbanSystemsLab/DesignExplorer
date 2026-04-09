@@ -29,7 +29,9 @@
     try {
       const hostname = new URL(url).hostname;
       urlLoadSource = hostname;
-    } catch { urlLoadSource = 'remote server'; }
+    } catch {
+      urlLoadSource = 'remote server';
+    }
     try {
       const { csvText, baseUrl } = await loadFromUrl(url);
       dataset.load(csvText, { type: 'url', name: url, baseUrl });
@@ -62,14 +64,18 @@
   <div class="flex-1 flex min-h-0">
     <!-- Sidebar -->
     {#if sidebarOpen && dataset.isLoaded}
-      <aside class="w-64 flex-shrink-0 bg-white border-r border-gray-200 overflow-y-auto flex flex-col">
+      <aside
+        class="w-64 flex-shrink-0 bg-white border-r border-gray-200 overflow-y-auto flex flex-col"
+      >
         <div class="flex items-center justify-between px-3 py-2 border-b border-gray-200">
           <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Controls</span>
           <button
-            class="text-gray-400 hover:text-gray-600 text-xs"
+            class="text-gray-400 hover:text-gray-600 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
             onclick={() => (sidebarOpen = false)}
             title="Close sidebar"
-          >&#10005;</button>
+            aria-label="Close sidebar"
+            aria-expanded="true">&#10005;</button
+          >
         </div>
 
         <InputSliders />
@@ -85,11 +91,7 @@
         <!-- Data table toggle -->
         <div class="border-t border-gray-200 mt-auto p-3">
           <label class="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
-            <input
-              type="checkbox"
-              bind:checked={showDataTable}
-              class="rounded border-gray-300"
-            />
+            <input type="checkbox" bind:checked={showDataTable} class="rounded border-gray-300" />
             Show data table
           </label>
         </div>
@@ -100,10 +102,12 @@
     {#if !sidebarOpen && dataset.isLoaded}
       <button
         class="flex-shrink-0 w-6 flex items-center justify-center bg-white border-r border-gray-200
-          text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
+          text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         onclick={() => (sidebarOpen = true)}
         title="Open sidebar"
-      >&#9654;</button>
+        aria-label="Open sidebar"
+        aria-expanded="false">&#9654;</button
+      >
     {/if}
 
     <!-- Main grid area -->
@@ -158,7 +162,10 @@
                   Retry
                 </button>
                 <button
-                  onclick={() => { urlLoadError = ''; showLoadModal = true; }}
+                  onclick={() => {
+                    urlLoadError = '';
+                    showLoadModal = true;
+                  }}
                   class="px-5 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg font-medium
                     hover:bg-gray-200 transition-colors"
                 >
@@ -173,12 +180,10 @@
         <div class="flex-1 flex items-center justify-center">
           <div class="text-center max-w-md">
             <div class="text-6xl mb-4">&#128200;</div>
-            <h2 class="text-xl font-semibold text-gray-900 mb-2">
-              Design Explorer
-            </h2>
+            <h2 class="text-xl font-semibold text-gray-900 mb-2">Design Explorer</h2>
             <p class="text-gray-500 mb-6">
-              Explore multi-dimensional parametric design spaces. Load a CSV
-              dataset to visualize and compare design alternatives.
+              Explore multi-dimensional parametric design spaces. Load a CSV dataset to visualize
+              and compare design alternatives.
             </p>
             <button
               onclick={() => (showLoadModal = true)}
