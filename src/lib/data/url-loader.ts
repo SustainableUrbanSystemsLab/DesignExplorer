@@ -38,77 +38,110 @@ export function normalizeCloudUrl(raw: string): string {
   return url;
 }
 
-/** Public CORS proxies tried in order when a direct fetch is blocked. */
+/** Public CORS proxies raced concurrently when a direct fetch is blocked. */
 const CORS_PROXIES = [
   (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  (url: string) =>
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
 ];
 
+/** Timeout for each individual fetch attempt in ms. */
+const FETCH_TIMEOUT_MS = 8_000;
+
 /** Number of full retry cycles (direct + all proxies) before giving up. */
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 2;
 
 /** Delay between retry cycles in ms. */
-const RETRY_DELAY_MS = 1500;
+const RETRY_DELAY_MS = 500;
+
+/**
+ * Fetch a URL with a timeout. Returns the response text if successful.
+ * Throws on network error, timeout, non-OK status, or abort.
+ */
+async function fetchWithTimeout(
+  url: string,
+  timeoutMs: number,
+  externalSignal?: AbortSignal
+): Promise<string> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  const onExternalAbort = () => controller.abort();
+  externalSignal?.addEventListener('abort', onExternalAbort);
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return await response.text();
+  } finally {
+    clearTimeout(timeoutId);
+    externalSignal?.removeEventListener('abort', onExternalAbort);
+  }
+}
 
 /**
  * Load CSV text from a URL.
  *
  * 1. Cloud-storage URLs (Dropbox, Google Drive) are normalised first.
- * 2. A direct `fetch` is attempted.
+ * 2. A direct `fetch` is attempted (with timeout).
  * 3. If the direct fetch fails (typically CORS), public CORS proxies are
- *    tried as a fallback so users can paste *any* hosted CSV link.
- * 4. If all methods fail, the whole cycle retries up to MAX_RETRIES times
- *    (free CORS proxies can be flaky).
+ *    raced concurrently — the fastest successful response wins.
+ * 4. If all methods fail, the whole cycle retries up to MAX_RETRIES times.
+ *
+ * An optional AbortSignal allows the caller to cancel in-flight loads.
  */
 export async function loadFromUrl(
-  rawUrl: string
+  rawUrl: string,
+  signal?: AbortSignal
 ): Promise<{ csvText: string; baseUrl: string; resolvedUrl: string }> {
   const resolvedUrl = normalizeCloudUrl(rawUrl);
+  const baseUrl = resolvedUrl.substring(
+    0,
+    resolvedUrl.lastIndexOf('/') + 1
+  );
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    // Wait before retrying (skip delay on first attempt)
     if (attempt > 0) {
       await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
     }
 
-    // --- Try direct fetch first ---
-    try {
-      const response = await fetch(resolvedUrl);
-      if (response.ok) {
-        const csvText = await response.text();
-        const baseUrl = resolvedUrl.substring(
-          0,
-          resolvedUrl.lastIndexOf('/') + 1
-        );
-        return { csvText, baseUrl, resolvedUrl };
-      }
-    } catch {
-      // Likely a CORS TypeError — fall through to proxy attempts
+    if (signal?.aborted) {
+      throw new DOMException('Load cancelled', 'AbortError');
     }
 
-    // --- Try CORS proxies ---
-    for (const buildProxyUrl of CORS_PROXIES) {
-      try {
-        const proxyUrl = buildProxyUrl(resolvedUrl);
-        const response = await fetch(proxyUrl);
-        if (response.ok) {
-          const csvText = await response.text();
-          // Base URL uses the *original* resolved URL (not the proxy) so
-          // relative image paths resolve to the real server.
-          const baseUrl = resolvedUrl.substring(
-            0,
-            resolvedUrl.lastIndexOf('/') + 1
-          );
-          return { csvText, baseUrl, resolvedUrl };
-        }
-      } catch {
-        // Try next proxy
-      }
+    // --- Try direct fetch first (instant failure for CORS) ---
+    try {
+      const csvText = await fetchWithTimeout(
+        resolvedUrl,
+        FETCH_TIMEOUT_MS,
+        signal
+      );
+      return { csvText, baseUrl, resolvedUrl };
+    } catch {
+      // Direct fetch failed — try CORS proxies
+    }
+
+    // --- Race all CORS proxies concurrently ---
+    try {
+      const csvText = await Promise.any(
+        CORS_PROXIES.map((buildProxyUrl) =>
+          fetchWithTimeout(
+            buildProxyUrl(resolvedUrl),
+            FETCH_TIMEOUT_MS,
+            signal
+          )
+        )
+      );
+      return { csvText, baseUrl, resolvedUrl };
+    } catch {
+      // All proxies failed this cycle — retry
     }
   }
 
   throw new Error(
-    'Failed to fetch CSV after multiple attempts. The server may be temporarily unavailable.'
+    'Failed to fetch CSV after multiple attempts. The server may be temporarily unavailable or blocking cross-origin requests.'
   );
 }
 

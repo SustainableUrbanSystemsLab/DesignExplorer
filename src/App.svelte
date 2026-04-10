@@ -21,8 +21,14 @@
   let urlLoadSource = $state('');
   let urlLoadError = $state('');
   let pendingUrl = $state('');
+  let loadAbortController: AbortController | null = null;
 
   async function loadUrlDataset(url: string) {
+    // Cancel any in-flight load
+    loadAbortController?.abort();
+    const controller = new AbortController();
+    loadAbortController = controller;
+
     urlLoading = true;
     urlLoadError = '';
     pendingUrl = url;
@@ -33,14 +39,19 @@
       urlLoadSource = 'remote server';
     }
     try {
-      const { csvText, baseUrl } = await loadFromUrl(url);
+      const { csvText, baseUrl } = await loadFromUrl(url, controller.signal);
+      if (controller.signal.aborted) return;
       dataset.load(csvText, { type: 'url', name: url, baseUrl });
       favorites.init(dataset.studyId);
     } catch (e) {
+      if (controller.signal.aborted) return;
       console.error('Failed to load from URL parameter:', e);
       urlLoadError = e instanceof Error ? e.message : 'Failed to load dataset';
     } finally {
-      urlLoading = false;
+      if (loadAbortController === controller) {
+        urlLoading = false;
+        loadAbortController = null;
+      }
     }
   }
 
