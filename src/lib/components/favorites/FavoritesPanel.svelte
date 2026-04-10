@@ -36,11 +36,13 @@
 
     const headers = dataset.columns.map((c) => c.originalName);
     const csvRows = rows.map((row) =>
-      headers.map((h) => {
-        const val = row[h];
-        const str = String(val ?? '');
-        return str.includes(',') ? `"${str}"` : str;
-      }).join(',')
+      headers
+        .map((h) => {
+          const val = row[h];
+          const str = String(val ?? '');
+          return str.includes(',') ? `"${str}"` : str;
+        })
+        .join(','),
     );
     const csv = [headers.join(','), ...csvRows].join('\n');
 
@@ -61,18 +63,20 @@
 
 <div class="flex flex-col">
   <button
-    class="flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+    class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
     onclick={() => (showPanel = !showPanel)}
+    aria-expanded={showPanel}
+    aria-controls="favorites-panel-content"
   >
     <span>
-      <span class="text-red-500 mr-1">&#9829;</span>
+      <span class="text-red-500 mr-1" aria-hidden="true">&#9829;</span>
       Favorites ({favorites.count})
     </span>
-    <span class="text-xs text-gray-400">{showPanel ? '\u25B2' : '\u25BC'}</span>
+    <span class="text-xs text-gray-400" aria-hidden="true">{showPanel ? '\u25B2' : '\u25BC'}</span>
   </button>
 
   {#if showPanel}
-    <div class="px-3 pb-3 space-y-2">
+    <div id="favorites-panel-content" class="px-3 pb-3 space-y-2">
       <!-- Filter toggle -->
       <label class="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
         <input
@@ -88,7 +92,7 @@
         <div class="max-h-40 overflow-y-auto space-y-1">
           {#each favorites.entries as entry}
             <button
-              class="w-full text-left px-2 py-1 text-xs rounded hover:bg-blue-50 transition-colors
+              class="w-full text-left px-2 py-1 text-xs rounded hover:bg-blue-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500
                 {selection.highlighted?._index === entry.rowIndex ? 'bg-blue-100' : ''}"
               onclick={() => navigateToFavorite(entry.rowIndex)}
             >
@@ -104,25 +108,25 @@
         <div class="flex flex-wrap gap-1 pt-1">
           <button
             onclick={handleExportJSON}
-            class="px-2 py-0.5 text-[10px] bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+            class="px-2 py-0.5 text-[10px] bg-gray-100 rounded hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             Export JSON
           </button>
           <button
             onclick={handleImportJSON}
-            class="px-2 py-0.5 text-[10px] bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+            class="px-2 py-0.5 text-[10px] bg-gray-100 rounded hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             Import JSON
           </button>
           <button
             onclick={handleExportCSV}
-            class="px-2 py-0.5 text-[10px] bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+            class="px-2 py-0.5 text-[10px] bg-gray-100 rounded hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             Export CSV
           </button>
           <button
             onclick={() => favorites.clearAll()}
-            class="px-2 py-0.5 text-[10px] bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors"
+            class="px-2 py-0.5 text-[10px] bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
           >
             Clear All
           </button>

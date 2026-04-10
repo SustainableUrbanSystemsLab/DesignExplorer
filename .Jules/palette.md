@@ -14,3 +14,6 @@
 ## 2025-04-09 - Icon-Only Button Accessibility
 **Learning:** Svelte icon-only buttons often lack ARIA attributes, making them invisible to screen readers.
 **Action:** Always ensure `aria-label`, `aria-expanded` (if toggleable), and `focus-visible` ring styling are present for custom buttons using unicode characters or SVGs.
+## 2025-02-23 - Proper ARIA semantics for collapsible panels and decorative icons
+**Learning:** Disclosure widgets (like the Favorites panel toggle) require `aria-expanded` and `aria-controls` to communicate state to screen readers. Additionally, text symbols used strictly for visual flair (such as arrows or hearts) should be hidden via `aria-hidden="true"` so screen readers do not read them as confusing unicode character names.
+**Action:** When implementing collapsible UI panels, always add the correct disclosure widget ARIA attributes. Also explicitly hide decorative text icons/symbols from screen readers.
