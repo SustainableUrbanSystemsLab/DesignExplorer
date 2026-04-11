@@ -9,7 +9,14 @@
   let sortColumn = $state<string>('');
   let sortAscending = $state<boolean>(true);
 
-  let filteredRows = $derived(selection.filteredRows);
+  let filteredRows = $derived.by(() => {
+    let rows = selection.filteredRows;
+    if (selection.showOnlyFavorites) {
+      const favIndices = favorites.favoriteIndices;
+      rows = rows.filter((r) => favIndices.has(r._index));
+    }
+    return rows;
+  });
 
   let sortedRows = $derived.by(() => {
     if (!sortColumn) return filteredRows;
@@ -81,42 +88,52 @@
 
   <!-- Thumbnail grid -->
   <div class="flex-1 overflow-auto p-2">
-    <div class="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2">
-      {#each sortedRows as row (row._index)}
-        {@const imgUrl = getImageUrl(row)}
-        {@const color = getColor(row)}
-        {@const isHighlighted = selection.highlighted?._index === row._index}
-        {@const isFav = favorites.isFavorite(dataset.getRowId(row))}
+    {#if sortedRows.length === 0}
+      <div class="h-full flex flex-col items-center justify-center text-center p-4">
+        <div class="text-3xl mb-2">&#128269;</div>
+        <p class="text-sm font-medium text-gray-900">No designs found</p>
+        <p class="text-xs text-gray-500 mt-1 max-w-[250px]">
+          Try adjusting your filters or clearing your selection to see more results.
+        </p>
+      </div>
+    {:else}
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2">
+        {#each sortedRows as row (row._index)}
+          {@const imgUrl = getImageUrl(row)}
+          {@const color = getColor(row)}
+          {@const isHighlighted = selection.highlighted?._index === row._index}
+          {@const isFav = favorites.isFavorite(dataset.getRowId(row))}
 
-        <button
-          class="relative aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
+          <button
+            class="relative aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
             {isHighlighted ? 'ring-2 ring-orange-400 scale-105' : ''}"
-          style="border-color: {color}"
-          onclick={() => selection.highlight(row)}
-          onmouseenter={() => selection.highlight(row)}
-          aria-label="Select design #{row._index}"
-          aria-current={isHighlighted ? 'true' : undefined}
-        >
-          {#if imgUrl}
-            <img src={imgUrl} alt="" class="w-full h-full object-cover" loading="lazy" />
-          {:else}
-            <div
-              class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-xs"
-            >
-              #{row._index}
-            </div>
-          {/if}
+            style="border-color: {color}"
+            onclick={() => selection.highlight(row)}
+            onmouseenter={() => selection.highlight(row)}
+            aria-label="Select design #{row._index}"
+            aria-current={isHighlighted ? 'true' : undefined}
+          >
+            {#if imgUrl}
+              <img src={imgUrl} alt="" class="w-full h-full object-cover" loading="lazy" />
+            {:else}
+              <div
+                class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-xs"
+              >
+                #{row._index}
+              </div>
+            {/if}
 
-          {#if isFav}
-            <div
-              class="absolute top-0.5 right-0.5 text-red-500 text-sm drop-shadow"
-              aria-hidden="true"
-            >
-              &#9829;
-            </div>
-          {/if}
-        </button>
-      {/each}
-    </div>
+            {#if isFav}
+              <div
+                class="absolute top-0.5 right-0.5 text-red-500 text-sm drop-shadow"
+                aria-hidden="true"
+              >
+                &#9829;
+              </div>
+            {/if}
+          </button>
+        {/each}
+      </div>
+    {/if}
   </div>
 </div>
