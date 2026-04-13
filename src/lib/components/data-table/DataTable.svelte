@@ -54,9 +54,17 @@
       {:else}
         {#each filteredRows as row (row._index)}
           <tr
-            class="border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors
+            class="border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors focus-visible:outline-none focus-visible:bg-blue-100 focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-500
             {selection.highlighted?._index === row._index ? 'bg-orange-50' : ''}"
+            tabindex="0"
+            aria-label="Select design {row._index}"
             onclick={() => selection.highlight(row)}
+            onkeydown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                selection.highlight(row);
+              }
+            }}
             onmouseenter={() => selection.highlight(row)}
           >
             <td class="px-2 py-1 text-gray-400">{row._index}</td>
