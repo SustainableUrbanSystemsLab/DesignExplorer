@@ -4,6 +4,7 @@
   import { favorites } from '../../stores/favorites.svelte';
 
   let showPanel = $state(false);
+  let confirmClear = $state(false);
 
   function handleExportJSON() {
     const json = favorites.exportJSON();
@@ -124,12 +125,35 @@
           >
             Export CSV
           </button>
-          <button
-            onclick={() => favorites.clearAll()}
-            class="px-2 py-0.5 text-[10px] bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
-          >
-            Clear All
-          </button>
+          {#if confirmClear}
+            <div class="flex items-center gap-1 bg-red-50 px-1 py-0.5 rounded">
+              <span class="text-[10px] text-red-600 font-medium px-1">Sure?</span>
+              <button
+                onclick={() => {
+                  favorites.clearAll();
+                  confirmClear = false;
+                }}
+                class="px-2 py-0.5 text-[10px] bg-red-600 text-white rounded hover:bg-red-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                aria-label="Confirm clear all favorites"
+              >
+                Yes
+              </button>
+              <button
+                onclick={() => (confirmClear = false)}
+                class="px-2 py-0.5 text-[10px] bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500"
+                aria-label="Cancel clear all favorites"
+              >
+                No
+              </button>
+            </div>
+          {:else}
+            <button
+              onclick={() => (confirmClear = true)}
+              class="px-2 py-0.5 text-[10px] bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+            >
+              Clear All
+            </button>
+          {/if}
         </div>
       {:else}
         <p class="text-xs text-gray-400">
