@@ -21,3 +21,7 @@
 ## 2024-04-12 - Destructive Action Confirmation
 **Learning:** Adding an inline confirmation step ("Sure? Yes / No") to destructive actions like "Clear All Favorites" prevents accidental data loss without requiring complex modal setups, making it a simple yet effective UX improvement.
 **Action:** Use this inline confirmation pattern for other destructive actions in the app to provide a safety net for users.
+## 2024-05-18 - Interactive Table Rows Need Explicit Keyboard Support
+**Learning:** In Svelte components where `<tr>` elements act as interactive selectable items with `onclick` handlers, they are not inherently focusable or interactive for keyboard users. Relying only on `hover` states excludes a significant portion of users.
+**Action:** When making custom non-interactive HTML elements (like `<tr>` or `<div>`) interactive, always pair `onclick` with `tabindex="0"`, an appropriate `onkeydown` handler for 'Enter' and 'Space', an `aria-label`, and `focus-visible` utility classes to guarantee keyboard accessibility and visible focus states.
+## 2026-04-14 - Dynamic Tooltips for Disabled States\n**Learning:** Users can easily get stuck when actionable buttons are disabled without context. Changing the native `title` attribute dynamically provides immediate, helpful feedback on what to do next.\n**Action:** Always verify what the `title` or `aria-label` says when an element enters a disabled state. Provide a short, actionable explanation instead of just stating the feature name.

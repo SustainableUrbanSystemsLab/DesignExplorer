@@ -122,7 +122,9 @@
       <button
         onclick={handleZoomToSelection}
         class="px-2.5 py-1.5 text-xs text-gray-600 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-        title="Zoom to currently filtered designs"
+        title={selection.brushes.length === 0
+          ? 'Select designs in the parallel coordinates chart before zooming'
+          : 'Zoom to currently filtered designs'}
         disabled={selection.brushes.length === 0}
       >
         Zoom In
@@ -131,7 +133,9 @@
       <button
         onclick={handleExcludeSelection}
         class="px-2.5 py-1.5 text-xs text-gray-600 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-        title="Exclude currently filtered designs"
+        title={selection.brushes.length === 0
+          ? 'Select designs in the parallel coordinates chart before excluding'
+          : 'Exclude currently filtered designs'}
         disabled={selection.brushes.length === 0}
       >
         Exclude
