@@ -103,7 +103,7 @@
     <button
       onclick={onLoadData}
       class="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg
-        hover:bg-blue-700 transition-colors"
+        hover:bg-blue-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
     >
       Load Data
     </button>
@@ -113,7 +113,7 @@
 
       <button
         onclick={handleReset}
-        class="px-2.5 py-1.5 text-xs text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+        class="px-2.5 py-1.5 text-xs text-gray-600 rounded-lg hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         title="Reset filters and show all designs"
       >
         Reset
@@ -145,7 +145,7 @@
 
       <button
         onclick={handleExportCSV}
-        class="px-2.5 py-1.5 text-xs text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+        class="px-2.5 py-1.5 text-xs text-gray-600 rounded-lg hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         title="Export filtered designs as CSV"
       >
         Export CSV
@@ -154,7 +154,7 @@
       {#if hasShareableUrl}
         <button
           onclick={handleCopyLink}
-          class="px-2.5 py-1.5 text-xs rounded-lg transition-colors
+          class="px-2.5 py-1.5 text-xs rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500
             {linkCopied ? 'bg-green-100 text-green-700' : 'text-gray-600 hover:bg-gray-100'}"
           title="Copy shareable link to clipboard"
         >
@@ -177,7 +177,7 @@
       href="https://github.com/SustainableUrbanSystemsLab/DesignExplorer"
       target="_blank"
       rel="noopener noreferrer"
-      class="text-gray-400 hover:text-gray-600 transition-colors"
+      class="text-gray-400 hover:text-gray-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg"
       title="View on GitHub"
       aria-label="View on GitHub"
     >
