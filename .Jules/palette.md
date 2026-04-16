@@ -28,3 +28,6 @@
 ## 2025-05-24 - Missing Focus Visible Styles
 **Learning:** Top-level navigation elements and primary action buttons often miss explicit `focus-visible` styling, making keyboard navigation difficult or impossible for accessibility users to track their current location.
 **Action:** Always ensure `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color]` utility classes are added to all interactive elements like buttons and links. Consider `focus-visible:ring-offset-X` for primary colored buttons to provide contrast against the button's background.
+## 2024-05-23 - Accessible Toggle Buttons with Direction Indicators
+**Learning:** Unicode sort indicator arrows (↑/↓) are confusing for screen readers, and dynamic selection states require specific attributes.
+**Action:** Use `aria-pressed` for active selection state. Hide unicode arrows with `aria-hidden="true"` and add screen reader text (`sr-only`) like "ascending"/"descending" alongside the visually hidden arrows. Ensure toggle buttons have `focus-visible` styling for keyboard navigation.

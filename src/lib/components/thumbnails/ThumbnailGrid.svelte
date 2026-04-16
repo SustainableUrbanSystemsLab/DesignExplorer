@@ -69,15 +69,17 @@
     <span class="text-xs text-gray-500 whitespace-nowrap">Sort by:</span>
     {#each dataset.numericColumns as col}
       <button
-        class="px-2 py-0.5 text-xs rounded-full border whitespace-nowrap transition-colors
+        class="px-2 py-0.5 text-xs rounded-full border whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500
           {sortColumn === col.originalName
           ? 'bg-blue-100 border-blue-300 text-blue-800'
           : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-100'}"
         onclick={() => toggleSort(col.originalName)}
+        aria-pressed={sortColumn === col.originalName}
       >
         {col.displayName}
         {#if sortColumn === col.originalName}
-          <span>{sortAscending ? '\u2191' : '\u2193'}</span>
+          <span aria-hidden="true">{sortAscending ? '\u2191' : '\u2193'}</span>
+          <span class="sr-only">({sortAscending ? 'ascending' : 'descending'})</span>
         {/if}
       </button>
     {/each}
