@@ -1,33 +1,3 @@
-## 2024-05-01 - Add missing ARIA labels to Icon Buttons and Focus Outlines
-**Learning:** In highly interactive Svelte components like `ViewerPanel` and `ThumbnailGrid`, toggle buttons and icon-only buttons (like favorites) often lack accessible names, role groupings, or state attributes like `aria-pressed`. This leaves screen reader users completely unaware of what the control does, or its current state. Additionally, `focus-visible` styling was not implemented causing a bad keyboard user experience.
-**Action:** When implementing toggles, add `role="group"` and `aria-pressed`. For icon-only buttons, use `aria-label` along with `aria-hidden="true"` on the underlying textual/graphical content to prevent redundant reading. Always add `focus-visible:ring-X` to interactive elements.
-
-## 2026-04-06 - Expand/Collapse Accessibility
-**Learning:** Found a common pattern where collapsible elements visually update using conditional rendering (`{#if showHelp}`), but screen reader users aren't informed of the state or the linked content.
-**Action:** Always add `aria-expanded` indicating the boolean state and `aria-controls` pointing to the `id` of the content block it toggles.
-
-## 2024-06-25 - Custom File Input Accessibility and Modal Escapes
-**Learning:** Hidden file inputs (`class="hidden"`) inside stylized labels completely break keyboard navigation, as users cannot tab to the input to trigger the file browser. Additionally, modals without keyboard (Escape) or explicit visual close buttons trap keyboard and screen reader users.
-**Action:** Use `class="sr-only"` instead of `class="hidden"` for custom file inputs, and add `focus-within:ring-2` on the parent label to visibly indicate focus. Always provide `<svelte:window onkeydown={(e) => e.key === 'Escape' && close()} />` and a clearly labeled `aria-label="Close modal"` button in dialog headers.## 2025-04-09 - Icon-Only Button Accessibility
-**Learning:** Svelte icon-only buttons often lack ARIA attributes, making them invisible to screen readers.
-**Action:** Always ensure ,  (if toggleable), and  ring styling are present for custom buttons using unicode characters or SVGs.
-## 2025-04-09 - Icon-Only Button Accessibility
-**Learning:** Svelte icon-only buttons often lack ARIA attributes, making them invisible to screen readers.
-**Action:** Always ensure `aria-label`, `aria-expanded` (if toggleable), and `focus-visible` ring styling are present for custom buttons using unicode characters or SVGs.
-## 2025-02-23 - Proper ARIA semantics for collapsible panels and decorative icons
-**Learning:** Disclosure widgets (like the Favorites panel toggle) require `aria-expanded` and `aria-controls` to communicate state to screen readers. Additionally, text symbols used strictly for visual flair (such as arrows or hearts) should be hidden via `aria-hidden="true"` so screen readers do not read them as confusing unicode character names.
-**Action:** When implementing collapsible UI panels, always add the correct disclosure widget ARIA attributes. Also explicitly hide decorative text icons/symbols from screen readers.
-## 2025-05-18 - Empty States in Data Tables and Grids\n**Learning:** Filtering options like brushing or checking "Show only favorites" can lead to empty datasets. Showing a blank grid or table can be confusing and lead users to think the app is broken. In tables specifically, empty states require a single cell spanning all columns using `colspan`.\n**Action:** Always provide empty state fallback UI (`{#if rows.length === 0}`) with clear icons, a concise message, and actionable next steps (like "Try clearing your selection"). In tables, dynamically calculate `colspan` to ensure the empty message spans the entire width without breaking the table layout.
-## 2024-04-12 - Destructive Action Confirmation
-**Learning:** Adding an inline confirmation step ("Sure? Yes / No") to destructive actions like "Clear All Favorites" prevents accidental data loss without requiring complex modal setups, making it a simple yet effective UX improvement.
-**Action:** Use this inline confirmation pattern for other destructive actions in the app to provide a safety net for users.
-## 2024-05-18 - Interactive Table Rows Need Explicit Keyboard Support
-**Learning:** In Svelte components where `<tr>` elements act as interactive selectable items with `onclick` handlers, they are not inherently focusable or interactive for keyboard users. Relying only on `hover` states excludes a significant portion of users.
-**Action:** When making custom non-interactive HTML elements (like `<tr>` or `<div>`) interactive, always pair `onclick` with `tabindex="0"`, an appropriate `onkeydown` handler for 'Enter' and 'Space', an `aria-label`, and `focus-visible` utility classes to guarantee keyboard accessibility and visible focus states.
-## 2026-04-14 - Dynamic Tooltips for Disabled States\n**Learning:** Users can easily get stuck when actionable buttons are disabled without context. Changing the native `title` attribute dynamically provides immediate, helpful feedback on what to do next.\n**Action:** Always verify what the `title` or `aria-label` says when an element enters a disabled state. Provide a short, actionable explanation instead of just stating the feature name.
-## 2025-05-24 - Missing Focus Visible Styles
-**Learning:** Top-level navigation elements and primary action buttons often miss explicit `focus-visible` styling, making keyboard navigation difficult or impossible for accessibility users to track their current location.
-**Action:** Always ensure `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color]` utility classes are added to all interactive elements like buttons and links. Consider `focus-visible:ring-offset-X` for primary colored buttons to provide contrast against the button's background.
-## 2024-05-23 - Accessible Toggle Buttons with Direction Indicators
-**Learning:** Unicode sort indicator arrows (↑/↓) are confusing for screen readers, and dynamic selection states require specific attributes.
-**Action:** Use `aria-pressed` for active selection state. Hide unicode arrows with `aria-hidden="true"` and add screen reader text (`sr-only`) like "ascending"/"descending" alongside the visually hidden arrows. Ensure toggle buttons have `focus-visible` styling for keyboard navigation.
+## 2024-04-17 - Actionable Empty States
+**Learning:** Empty states in data exploration tools (like parallel coordinates) often happen accidentally via over-filtering. Users need immediate recovery paths within the context of the empty state itself, rather than hunting for global controls (like a Navbar reset button).
+**Action:** Always provide an actionable recovery button (e.g., "Reset Filters") directly within "No results found" empty states to reduce cognitive load and friction.
