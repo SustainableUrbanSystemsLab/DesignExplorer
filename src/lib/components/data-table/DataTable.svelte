@@ -14,6 +14,13 @@
   let displayColumns = $derived(
     dataset.columns.filter((c) => c.classification !== 'image' && c.classification !== 'threeD'),
   );
+
+  function handleResetFilters() {
+    dataset.reset();
+    selection.clearBrushes();
+    selection.showOnlyFavorites = false;
+    selection.highlight(null);
+  }
 </script>
 
 <div class="w-full h-full overflow-auto">
@@ -46,9 +53,15 @@
           >
             <div class="text-3xl mb-2">&#128269;</div>
             <p class="text-sm font-medium text-gray-900">No designs found</p>
-            <p class="text-xs text-gray-500 mt-1">
+            <p class="text-xs text-gray-500 mt-1 mb-4">
               Try adjusting your filters or clearing your selection to see more results.
             </p>
+            <button
+              onclick={handleResetFilters}
+              class="px-4 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            >
+              Reset Filters
+            </button>
           </td>
         </tr>
       {:else}
