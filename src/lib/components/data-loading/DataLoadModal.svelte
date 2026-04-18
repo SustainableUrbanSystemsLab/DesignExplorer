@@ -50,11 +50,7 @@
     try {
       const file = files[0];
       const result = await loadFile(file);
-      dataset.load(
-        result.csvText,
-        { type: 'file', name: file.name },
-        result.assets
-      );
+      dataset.load(result.csvText, { type: 'file', name: file.name }, result.assets);
       favorites.init(dataset.studyId);
       onclose();
     } catch (e) {
@@ -81,7 +77,7 @@
     try {
       const base = import.meta.env.BASE_URL;
       const { csvText, baseUrl } = await loadFromUrl(
-        `${window.location.origin}${base}sample-data/red-box/LittleRedBox.csv`
+        `${window.location.origin}${base}sample-data/red-box/LittleRedBox.csv`,
       );
       dataset.load(csvText, { type: 'url', name: 'Sample: Red Box', baseUrl });
       favorites.init(dataset.studyId);
@@ -94,7 +90,11 @@
   }
 </script>
 
-<svelte:window onkeydown={(e) => { if (e.key === 'Escape' && open) onclose(); }} />
+<svelte:window
+  onkeydown={(e) => {
+    if (e.key === 'Escape' && open) onclose();
+  }}
+/>
 
 {#if open}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -102,7 +102,9 @@
   <!-- svelte-ignore a11y_interactive_supports_focus -->
   <div
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-    onclick={(e) => { if (e.target === e.currentTarget) onclose(); }}
+    onclick={(e) => {
+      if (e.target === e.currentTarget) onclose();
+    }}
     role="dialog"
     aria-modal="true"
     aria-labelledby="modal-title"
@@ -118,31 +120,44 @@
         </div>
         <button
           onclick={onclose}
-          class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg p-1 transition-colors"
+          class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           aria-label="Close modal"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
 
       <!-- Tabs -->
-      <div class="flex border-b border-gray-200">
+      <div class="flex border-b border-gray-200" role="tablist" aria-label="Load Dataset Options">
         <button
-          class="flex-1 px-4 py-2 text-sm font-medium transition-colors
+          id="tab-file"
+          role="tab"
+          aria-selected={activeTab === 'file'}
+          aria-controls="panel-file"
+          class="flex-1 px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500
             {activeTab === 'file'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-500 hover:text-gray-700'}"
+            ? 'text-blue-600 border-b-2 border-blue-600'
+            : 'text-gray-500 hover:text-gray-700'}"
           onclick={() => (activeTab = 'file')}
         >
           Upload File
         </button>
         <button
-          class="flex-1 px-4 py-2 text-sm font-medium transition-colors
+          id="tab-url"
+          role="tab"
+          aria-selected={activeTab === 'url'}
+          aria-controls="panel-url"
+          class="flex-1 px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500
             {activeTab === 'url'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-500 hover:text-gray-700'}"
+            ? 'text-blue-600 border-b-2 border-blue-600'
+            : 'text-gray-500 hover:text-gray-700'}"
           onclick={() => (activeTab = 'url')}
         >
           From URL
@@ -154,30 +169,46 @@
         {#if activeTab === 'file'}
           <!-- Drag and drop zone -->
           <div
-            class="border-2 border-dashed rounded-xl p-8 text-center transition-colors
-              {dragOver ? 'border-blue-400 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}"
-            ondrop={handleDrop}
-            ondragover={handleDragOver}
-            ondragleave={() => (dragOver = false)}
+            id="panel-file"
+            role="tabpanel"
+            aria-labelledby="tab-file"
+            tabindex="0"
+            class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl"
           >
-            <div class="text-4xl mb-3">&#128194;</div>
-            <p class="text-sm text-gray-600 mb-2">
-              Drag & drop a <strong>.csv</strong> or <strong>.zip</strong> file here
-            </p>
-            <p class="text-xs text-gray-400 mb-3">or</p>
-            <label class="inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded-lg cursor-pointer hover:bg-blue-700 transition-colors focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2">
-              Browse Files
-              <input
-                type="file"
-                accept=".csv,.zip"
-                class="sr-only"
-                onchange={(e) => handleFiles((e.target as HTMLInputElement).files)}
-              />
-            </label>
+            <div
+              class="border-2 border-dashed rounded-xl p-8 text-center transition-colors
+              {dragOver ? 'border-blue-400 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}"
+              ondrop={handleDrop}
+              ondragover={handleDragOver}
+              ondragleave={() => (dragOver = false)}
+            >
+              <div class="text-4xl mb-3">&#128194;</div>
+              <p class="text-sm text-gray-600 mb-2">
+                Drag & drop a <strong>.csv</strong> or <strong>.zip</strong> file here
+              </p>
+              <p class="text-xs text-gray-400 mb-3">or</p>
+              <label
+                class="inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded-lg cursor-pointer hover:bg-blue-700 transition-colors focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2"
+              >
+                Browse Files
+                <input
+                  type="file"
+                  accept=".csv,.zip"
+                  class="sr-only"
+                  onchange={(e) => handleFiles((e.target as HTMLInputElement).files)}
+                />
+              </label>
+            </div>
           </div>
         {:else}
           <!-- URL input -->
-          <div class="space-y-3">
+          <div
+            id="panel-url"
+            role="tabpanel"
+            aria-labelledby="tab-url"
+            tabindex="0"
+            class="space-y-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl"
+          >
             <div>
               <label for="csv-url" class="block text-sm font-medium text-gray-700 mb-1">
                 CSV URL
@@ -189,17 +220,20 @@
                 placeholder="https://example.com/study/data.csv"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                onkeydown={(e) => { if (e.key === 'Enter') handleUrl(); }}
+                onkeydown={(e) => {
+                  if (e.key === 'Enter') handleUrl();
+                }}
               />
             </div>
             <p class="text-xs text-gray-400">
-              Images referenced in the CSV with relative paths will be resolved relative to this URL.
+              Images referenced in the CSV with relative paths will be resolved relative to this
+              URL.
             </p>
             <button
               onclick={handleUrl}
               disabled={loading || !urlInput.trim()}
               class="w-full px-4 py-2 bg-blue-600 text-white text-sm rounded-lg
-                hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               {loading ? 'Loading...' : 'Load Dataset'}
             </button>
@@ -225,7 +259,7 @@
             onclick={loadSample}
             disabled={loading}
             class="px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg
-              hover:bg-gray-200 disabled:opacity-50 transition-colors"
+              hover:bg-gray-200 disabled:opacity-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
           >
             Red Box Parametric Study (125 designs)
           </button>
@@ -237,18 +271,20 @@
             onclick={() => (showHelp = !showHelp)}
             aria-expanded={showHelp}
             aria-controls="csv-help-content"
-            class="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
+            class="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
           >
-            <span class="inline-block transition-transform {showHelp ? 'rotate-90' : ''}"
-              style="font-size: 10px;">&#9654;</span>
+            <span
+              class="inline-block transition-transform {showHelp ? 'rotate-90' : ''}"
+              style="font-size: 10px;">&#9654;</span
+            >
             How to prepare your CSV
           </button>
 
           {#if showHelp}
             <div id="csv-help-content" class="mt-3 text-xs text-gray-600 space-y-3">
               <p>
-                Each row represents one design iteration. Use column name prefixes to
-                tell Design Explorer how to interpret your data:
+                Each row represents one design iteration. Use column name prefixes to tell Design
+                Explorer how to interpret your data:
               </p>
 
               <table class="w-full text-left border-collapse">
@@ -261,19 +297,31 @@
                 <tbody class="font-mono">
                   <tr class="border-b border-gray-100">
                     <td class="py-1 pr-3 text-blue-600">in:</td>
-                    <td class="font-sans">Input parameter (e.g. <code class="bg-gray-100 px-1 rounded">in:Width</code>)</td>
+                    <td class="font-sans"
+                      >Input parameter (e.g. <code class="bg-gray-100 px-1 rounded">in:Width</code
+                      >)</td
+                    >
                   </tr>
                   <tr class="border-b border-gray-100">
                     <td class="py-1 pr-3 text-green-600">out:</td>
-                    <td class="font-sans">Output metric (e.g. <code class="bg-gray-100 px-1 rounded">out:Energy</code>)</td>
+                    <td class="font-sans"
+                      >Output metric (e.g. <code class="bg-gray-100 px-1 rounded">out:Energy</code
+                      >)</td
+                    >
                   </tr>
                   <tr class="border-b border-gray-100">
                     <td class="py-1 pr-3 text-purple-600">img</td>
-                    <td class="font-sans">Image path (e.g. <code class="bg-gray-100 px-1 rounded">img:Perspective</code>)</td>
+                    <td class="font-sans"
+                      >Image path (e.g. <code class="bg-gray-100 px-1 rounded">img:Perspective</code
+                      >)</td
+                    >
                   </tr>
                   <tr>
                     <td class="py-1 pr-3 text-orange-600">threeD</td>
-                    <td class="font-sans">3D model path (e.g. <code class="bg-gray-100 px-1 rounded">threeD:Model</code>)</td>
+                    <td class="font-sans"
+                      >3D model path (e.g. <code class="bg-gray-100 px-1 rounded">threeD:Model</code
+                      >)</td
+                    >
                   </tr>
                 </tbody>
               </table>
@@ -285,22 +333,23 @@
                   <code class="bg-gray-100 px-1 rounded">out:Cooling[kWh]</code>
                 </p>
                 <p>
-                  <strong class="text-gray-700">Images</strong> &mdash; Values can be relative paths
-                  (resolved from the CSV location) or full URLs. Supported formats: PNG, JPG, SVG, WebP.
+                  <strong class="text-gray-700">Images</strong> &mdash; Values can be relative paths (resolved
+                  from the CSV location) or full URLs. Supported formats: PNG, JPG, SVG, WebP.
                 </p>
                 <p>
-                  <strong class="text-gray-700">3D Models</strong> &mdash; Supported formats: glTF, GLB, STL, OBJ,
-                  and Spectacles JSON (from Grasshopper).
+                  <strong class="text-gray-700">3D Models</strong> &mdash; Supported formats: glTF, GLB,
+                  STL, OBJ, and Spectacles JSON (from Grasshopper).
                 </p>
                 <p>
-                  <strong class="text-gray-700">No prefix?</strong> &mdash; Columns without a recognized prefix
-                  are treated as general numeric data and appear in the parallel coordinates chart.
+                  <strong class="text-gray-700">No prefix?</strong> &mdash; Columns without a recognized
+                  prefix are treated as general numeric data and appear in the parallel coordinates chart.
                 </p>
               </div>
 
               <div class="bg-gray-50 rounded-lg p-3 overflow-x-auto">
                 <p class="font-semibold text-gray-700 mb-1.5">Example CSV:</p>
-                <pre class="text-[11px] leading-relaxed text-gray-600 whitespace-pre">in:Width[m],in:Height[m],out:Area[m2],out:Energy[kWh],img:Render,threeD:Model
+                <pre
+                  class="text-[11px] leading-relaxed text-gray-600 whitespace-pre">in:Width[m],in:Height[m],out:Area[m2],out:Energy[kWh],img:Render,threeD:Model
 5,3,15,120,renders/001.png,models/001.glb
 8,4,32,210,renders/002.png,models/002.glb
 10,3,30,180,renders/003.png,models/003.glb</pre>
