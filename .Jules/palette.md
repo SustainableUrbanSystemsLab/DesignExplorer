@@ -4,3 +4,6 @@
 ## 2023-10-27 - Svelte Custom Tab Accessibility
 **Learning:** Custom tab implementations built with Svelte `#if` blocks and state variables inherently lack the semantic meaning screen readers require to navigate tabs effectively.
 **Action:** Always verify that components mimicking standard UI controls (like tabs) explicitly declare their roles (`tablist`, `tab`, `tabpanel`) and manage ARIA states (`aria-selected`, `aria-controls`, `aria-labelledby`) to ensure full accessibility. Additionally, apply `focus-visible` styles to tab buttons and active panels to support keyboard navigation.
+## 2024-04-19 - Accessible Disabled Action States
+**Learning:** When actions like 'Export' are dynamically disabled due to state changes (e.g., empty filters), simply removing pointer events is insufficient. Providing a disabled state combined with a tooltip explaining *why* the action is unavailable prevents user frustration and improves discoverability.
+**Action:** Add explicit visual disabled states and explanatory `title` or `aria-label` tooltips to context-dependent buttons when their prerequisites are not met.
