@@ -145,8 +145,11 @@
 
       <button
         onclick={handleExportCSV}
-        class="px-2.5 py-1.5 text-xs text-gray-600 rounded-lg hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-        title="Export filtered designs as CSV"
+        class="px-2.5 py-1.5 text-xs text-gray-600 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        title={selection.filteredCount === 0
+          ? 'No designs currently filtered to export'
+          : 'Export filtered designs as CSV'}
+        disabled={selection.filteredCount === 0}
       >
         Export CSV
       </button>
