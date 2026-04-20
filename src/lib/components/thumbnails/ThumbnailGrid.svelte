@@ -129,7 +129,12 @@
             aria-current={isHighlighted ? 'true' : undefined}
           >
             {#if imgUrl}
-              <img src={imgUrl} alt="" class="w-full h-full object-cover" loading="lazy" />
+              <img
+                src={imgUrl}
+                alt="Thumbnail for design #{row._index}"
+                class="w-full h-full object-cover"
+                loading="lazy"
+              />
             {:else}
               <div
                 class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-xs"
