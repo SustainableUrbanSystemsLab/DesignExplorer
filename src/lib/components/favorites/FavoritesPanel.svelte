@@ -104,27 +104,37 @@
             </button>
           {/each}
         </div>
+      {:else}
+        <p class="text-xs text-gray-400">
+          Click the heart icon on a design to add it to your favorites.
+        </p>
+      {/if}
 
-        <!-- Actions -->
-        <div class="flex flex-wrap gap-1 pt-1">
-          <button
-            onclick={handleExportJSON}
-            class="px-2 py-0.5 text-[10px] bg-gray-100 rounded hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-          >
-            Export JSON
-          </button>
-          <button
-            onclick={handleImportJSON}
-            class="px-2 py-0.5 text-[10px] bg-gray-100 rounded hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-          >
-            Import JSON
-          </button>
-          <button
-            onclick={handleExportCSV}
-            class="px-2 py-0.5 text-[10px] bg-gray-100 rounded hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-          >
-            Export CSV
-          </button>
+      <!-- Actions -->
+      <div class="flex flex-wrap gap-1 pt-1">
+        <button
+          onclick={handleExportJSON}
+          disabled={favorites.count === 0}
+          title={favorites.count === 0 ? 'No favorites to export' : 'Export favorites to JSON'}
+          class="px-2 py-0.5 text-[10px] bg-gray-100 rounded hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Export JSON
+        </button>
+        <button
+          onclick={handleImportJSON}
+          class="px-2 py-0.5 text-[10px] bg-gray-100 rounded hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        >
+          Import JSON
+        </button>
+        <button
+          onclick={handleExportCSV}
+          disabled={favorites.count === 0}
+          title={favorites.count === 0 ? 'No favorites to export' : 'Export favorites to CSV'}
+          class="px-2 py-0.5 text-[10px] bg-gray-100 rounded hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Export CSV
+        </button>
+        {#if favorites.count > 0}
           {#if confirmClear}
             <div class="flex items-center gap-1 bg-red-50 px-1 py-0.5 rounded">
               <span class="text-[10px] text-red-600 font-medium px-1">Sure?</span>
@@ -154,12 +164,8 @@
               Clear All
             </button>
           {/if}
-        </div>
-      {:else}
-        <p class="text-xs text-gray-400">
-          Click the heart icon on a design to add it to your favorites.
-        </p>
-      {/if}
+        {/if}
+      </div>
     </div>
   {/if}
 </div>

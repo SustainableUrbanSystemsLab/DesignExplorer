@@ -7,3 +7,6 @@
 ## 2024-04-19 - Accessible Disabled Action States
 **Learning:** When actions like 'Export' are dynamically disabled due to state changes (e.g., empty filters), simply removing pointer events is insufficient. Providing a disabled state combined with a tooltip explaining *why* the action is unavailable prevents user frustration and improves discoverability.
 **Action:** Add explicit visual disabled states and explanatory `title` or `aria-label` tooltips to context-dependent buttons when their prerequisites are not met.
+## 2026-04-21 - Action Discoverability in Empty States
+**Learning:** When components like Favorites lists have an empty state, wrapping all actions inside a 'count > 0' conditional completely removes the ability to populate the list via external means (e.g., Import JSON), trapping the user.
+**Action:** Ensure that data-ingestion actions (like Import, Add, Create) remain visible and fully functional outside of empty-state blocks. Provide clear disabled states (with 'title' tooltips) for data-export actions instead of hiding them completely.
