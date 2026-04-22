@@ -168,7 +168,7 @@
                 <button
                   onclick={() => loadUrlDataset(pendingUrl)}
                   class="px-5 py-2 bg-blue-600 text-white text-sm rounded-lg font-medium
-                    hover:bg-blue-700 transition-colors"
+                    hover:bg-blue-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 >
                   Retry
                 </button>
@@ -178,7 +178,7 @@
                     showLoadModal = true;
                   }}
                   class="px-5 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg font-medium
-                    hover:bg-gray-200 transition-colors"
+                    hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 >
                   Load different file
                 </button>
@@ -199,7 +199,7 @@
             <button
               onclick={() => (showLoadModal = true)}
               class="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium
-                hover:bg-blue-700 transition-colors shadow-sm"
+                hover:bg-blue-700 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               Load a Dataset
             </button>
@@ -209,7 +209,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200
-                  hover:border-gray-300 hover:bg-gray-50 transition-colors text-gray-600 hover:text-gray-900"
+                  hover:border-gray-300 hover:bg-gray-50 transition-colors text-gray-600 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 <img
                   src="https://github.com/kastnerp.png"
