@@ -10,3 +10,6 @@
 ## 2026-04-21 - Action Discoverability in Empty States
 **Learning:** When components like Favorites lists have an empty state, wrapping all actions inside a 'count > 0' conditional completely removes the ability to populate the list via external means (e.g., Import JSON), trapping the user.
 **Action:** Ensure that data-ingestion actions (like Import, Add, Create) remain visible and fully functional outside of empty-state blocks. Provide clear disabled states (with 'title' tooltips) for data-export actions instead of hiding them completely.
+## 2024-05-18 - Consistent Keyboard Navigation and ARIA on Toggle Buttons
+**Learning:** Custom toggle buttons and inline actions often miss keyboard focus states and screen reader state announcements (`aria-pressed`), making them invisible or confusing to non-mouse users.
+**Action:** Always ensure that every interactive element has consistent `focus-visible:ring-2 focus-visible:ring-blue-500` styles. Additionally, explicitly use `aria-pressed` on buttons that act as toggles so their state is properly conveyed to assistive technologies.

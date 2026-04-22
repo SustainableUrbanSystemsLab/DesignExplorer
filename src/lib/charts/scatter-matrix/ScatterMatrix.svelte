@@ -28,9 +28,7 @@
 
   function getColorScale(): ColorScale | null {
     if (!selection.colorDimension) return null;
-    const col = dataset.columns.find(
-      (c) => c.originalName === selection.colorDimension
-    );
+    const col = dataset.columns.find((c) => c.originalName === selection.colorDimension);
     if (!col) return null;
     return createColorScale(col, dataset.rows);
   }
@@ -82,15 +80,18 @@
 <div bind:this={containerEl} class="flex flex-col w-full h-full min-h-[200px]">
   <!-- Dimension selector — fixed max height with scroll to not crush the chart -->
   {#if dataset.isLoaded}
-    <div class="flex-shrink-0 max-h-[56px] overflow-y-auto border-b border-gray-200 bg-gray-50 px-2 py-1.5">
+    <div
+      class="flex-shrink-0 max-h-[56px] overflow-y-auto border-b border-gray-200 bg-gray-50 px-2 py-1.5"
+    >
       <div class="flex flex-wrap gap-1">
         {#each dataset.numericColumns as col}
           <button
-            class="px-2 py-0.5 text-xs rounded-full border transition-colors whitespace-nowrap
+            class="px-2 py-0.5 text-xs rounded-full border transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500
               {selectedDimensions.includes(col.originalName)
-                ? 'bg-blue-100 border-blue-300 text-blue-800'
-                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-100'}"
+              ? 'bg-blue-100 border-blue-300 text-blue-800'
+              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-100'}"
             onclick={() => toggleDimension(col.originalName)}
+            aria-pressed={selectedDimensions.includes(col.originalName)}
           >
             {col.displayName}
           </button>
