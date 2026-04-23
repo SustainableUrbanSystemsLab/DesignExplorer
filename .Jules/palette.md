@@ -13,3 +13,6 @@
 ## 2024-05-18 - Consistent Keyboard Navigation and ARIA on Toggle Buttons
 **Learning:** Custom toggle buttons and inline actions often miss keyboard focus states and screen reader state announcements (`aria-pressed`), making them invisible or confusing to non-mouse users.
 **Action:** Always ensure that every interactive element has consistent `focus-visible:ring-2 focus-visible:ring-blue-500` styles. Additionally, explicitly use `aria-pressed` on buttons that act as toggles so their state is properly conveyed to assistive technologies.
+## 2025-02-12 - Inline Deletion Actions for Quick Lists
+**Learning:** For quick-access lists (like a favorites panel), requiring users to navigate away from their current context or select an item just to remove it causes unnecessary friction. Users expect inline management for simple lists.
+**Action:** Provide inline deletion/removal buttons directly within list items, ensuring they are accessible via keyboard focus and screen readers, but visually subtle (e.g., appearing on hover or focus) to avoid cluttering the UI.

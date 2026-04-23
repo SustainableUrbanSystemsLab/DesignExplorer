@@ -90,18 +90,28 @@
 
       <!-- Favorites list -->
       {#if favorites.count > 0}
-        <div class="max-h-40 overflow-y-auto space-y-1">
+        <div class="max-h-40 overflow-y-auto space-y-1 pr-1">
           {#each favorites.entries as entry}
-            <button
-              class="w-full text-left px-2 py-1 text-xs rounded hover:bg-blue-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500
-                {selection.highlighted?._index === entry.rowIndex ? 'bg-blue-100' : ''}"
-              onclick={() => navigateToFavorite(entry.rowIndex)}
-            >
-              <span class="font-medium">Design #{entry.rowIndex}</span>
-              {#if entry.note}
-                <span class="text-gray-400 ml-1">- {entry.note}</span>
-              {/if}
-            </button>
+            <div class="flex items-center gap-1 w-full group">
+              <button
+                class="flex-1 text-left px-2 py-1 text-xs rounded hover:bg-blue-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500
+                  {selection.highlighted?._index === entry.rowIndex ? 'bg-blue-100' : ''}"
+                onclick={() => navigateToFavorite(entry.rowIndex)}
+              >
+                <span class="font-medium">Design #{entry.rowIndex}</span>
+                {#if entry.note}
+                  <span class="text-gray-400 ml-1">- {entry.note}</span>
+                {/if}
+              </button>
+              <button
+                class="px-1.5 py-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+                onclick={() => favorites.toggle(entry.rowIndex, entry.rowId)}
+                title="Remove from favorites"
+                aria-label="Remove design #{entry.rowIndex} from favorites"
+              >
+                <span aria-hidden="true">&#10005;</span>
+              </button>
+            </div>
           {/each}
         </div>
       {:else}
