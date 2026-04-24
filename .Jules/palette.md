@@ -16,3 +16,6 @@
 ## 2025-02-12 - Inline Deletion Actions for Quick Lists
 **Learning:** For quick-access lists (like a favorites panel), requiring users to navigate away from their current context or select an item just to remove it causes unnecessary friction. Users expect inline management for simple lists.
 **Action:** Provide inline deletion/removal buttons directly within list items, ensuring they are accessible via keyboard focus and screen readers, but visually subtle (e.g., appearing on hover or focus) to avoid cluttering the UI.
+## 2026-04-24 - Consistent Keyboard Navigation Focus Rings on Native Inputs
+**Learning:** Native input elements like range sliders and checkboxes often lack sufficient default focus indicators across browsers, making keyboard navigation difficult to track for users. While custom buttons often receive focus styles, native inputs are sometimes overlooked.
+**Action:** Always ensure that native interactive elements (`<input type="range">`, `<input type="checkbox">`) have consistent `focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1` styles to clearly indicate focus state.
