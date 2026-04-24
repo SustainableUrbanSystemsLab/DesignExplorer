@@ -83,7 +83,7 @@
         <input
           type="checkbox"
           bind:checked={selection.showOnlyFavorites}
-          class="rounded border-gray-300"
+          class="rounded border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
         />
         Show only favorites
       </label>

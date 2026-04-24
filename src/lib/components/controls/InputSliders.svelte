@@ -5,7 +5,9 @@
   /**
    * For each input dimension, find the closest design to the current slider values.
    */
-  function findClosestDesign(targetValues: Record<string, number>): import('../../types/data').DesignRow | null {
+  function findClosestDesign(
+    targetValues: Record<string, number>,
+  ): import('../../types/data').DesignRow | null {
     const inputCols = dataset.inputColumns.filter((c) => c.isNumeric);
     if (inputCols.length === 0) return null;
 
@@ -40,7 +42,7 @@
         currentValues[col.originalName] = value;
       } else if (selection.highlighted) {
         const v = selection.highlighted[col.originalName];
-        currentValues[col.originalName] = typeof v === 'number' ? v : col.min ?? 0;
+        currentValues[col.originalName] = typeof v === 'number' ? v : (col.min ?? 0);
       } else {
         currentValues[col.originalName] = col.min ?? 0;
       }
@@ -52,17 +54,16 @@
 
 {#if dataset.inputColumns.length > 0}
   <div class="space-y-3 p-3">
-    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-      Input Parameters
-    </h3>
+    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Input Parameters</h3>
 
     {#each dataset.inputColumns.filter((c) => c.isNumeric) as col}
       {@const value = selection.highlighted
         ? (selection.highlighted[col.originalName] as number)
-        : col.min ?? 0}
-      {@const step = col.uniqueValues && col.uniqueValues.length > 1
-        ? Math.abs(Number(col.uniqueValues[1]) - Number(col.uniqueValues[0]))
-        : (((col.max ?? 1) - (col.min ?? 0)) / 20)}
+        : (col.min ?? 0)}
+      {@const step =
+        col.uniqueValues && col.uniqueValues.length > 1
+          ? Math.abs(Number(col.uniqueValues[1]) - Number(col.uniqueValues[0]))
+          : ((col.max ?? 1) - (col.min ?? 0)) / 20}
       {@const sliderId = `slider-${col.originalName}`}
 
       <div>
@@ -83,11 +84,11 @@
           min={col.min ?? 0}
           max={col.max ?? 1}
           {step}
-          value={typeof value === 'number' ? value : col.min ?? 0}
+          value={typeof value === 'number' ? value : (col.min ?? 0)}
           oninput={(e) =>
             handleSliderChange(col.originalName, Number((e.target as HTMLInputElement).value))}
           class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer
-            accent-blue-600"
+            accent-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
         />
         <div class="flex justify-between text-[10px] text-gray-400 mt-0.5">
           <span>{col.min?.toFixed(1)}</span>
