@@ -102,7 +102,11 @@
         <!-- Data table toggle -->
         <div class="border-t border-gray-200 mt-auto p-3">
           <label class="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
-            <input type="checkbox" bind:checked={showDataTable} class="rounded border-gray-300" />
+            <input
+              type="checkbox"
+              bind:checked={showDataTable}
+              class="rounded border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
+            />
             Show data table
           </label>
         </div>
