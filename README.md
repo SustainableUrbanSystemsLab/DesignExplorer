@@ -17,21 +17,36 @@ npm run dev
 
 ## CSV Format
 
-| Prefix | Meaning | Example |
-|--------|---------|---------|
-| `in:` | Input parameter | `in:Depth [ft]` |
-| `out:` | Output metric | `out:Cooling[kWh]` |
-| `img` | Image path | `img`, `img:perspective` |
-| `threeD` | 3D model (glTF/STL/OBJ) | `threeD` |
+| Prefix   | Meaning                 | Example                  |
+| -------- | ----------------------- | ------------------------ |
+| `in:`    | Input parameter         | `in:Depth [ft]`          |
+| `out:`   | Output metric           | `out:Cooling[kWh]`       |
+| `img`    | Image path              | `img`, `img:perspective` |
+| `threeD` | 3D model (glTF/STL/OBJ) | `threeD`                 |
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Dev server |
-| `npm run build` | Production build |
-| `npm test` | Unit tests |
-| `npm run check` | Type check |
+| Command                   | Description                       |
+| ------------------------- | --------------------------------- |
+| `npm run dev`             | Dev server                        |
+| `npm run build`           | Production build                  |
+| `npm test`                | Unit tests                        |
+| `npm run check`           | Type check                        |
+| `npm run release:dry-run` | Preview the next semantic release |
+
+## Versioning
+
+Releases are automated from commits on `main` using Semantic Versioning.
+
+Use Conventional Commits so the release workflow can choose the right version bump:
+
+| Commit type                                                                         | Version bump |
+| ----------------------------------------------------------------------------------- | ------------ |
+| `fix:`, `perf:`, `refactor:`, `style:`, `docs:`, `test:`, `build:`, `ci:`, `chore:` | Patch        |
+| `feat:`                                                                             | Minor        |
+| `BREAKING CHANGE:` in the commit body, or `!` after the type/scope                  | Major        |
+
+The release workflow updates `package.json`, `package-lock.json`, and `CHANGELOG.md`, creates a `vX.Y.Z` tag and GitHub Release, then deploys the versioned build to GitHub Pages.
 
 ## Tech Stack
 
