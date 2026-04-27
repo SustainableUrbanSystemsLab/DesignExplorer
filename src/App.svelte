@@ -155,13 +155,13 @@
         <!-- Loading / error state for URL parameter -->
         <div class="flex-1 flex items-center justify-center">
           <div class="text-center max-w-sm">
-            <div class="text-5xl mb-5">&#128200;</div>
+            <div class="text-5xl mb-5" aria-hidden="true">&#128200;</div>
             {#if urlLoading}
               <h2 class="text-lg font-semibold text-gray-900 mb-2">Loading Dataset</h2>
               <p class="text-sm text-gray-500 mb-6">
                 Fetching data from <span class="font-medium text-gray-700">{urlLoadSource}</span>
               </p>
-              <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+              <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden" role="progressbar" aria-label="Loading dataset">
                 <div class="h-full bg-blue-600 rounded-full animate-loading-bar"></div>
               </div>
               <p class="text-xs text-gray-400 mt-3">This may take a few seconds&hellip;</p>
@@ -194,7 +194,7 @@
         <!-- Empty state -->
         <div class="flex-1 flex items-center justify-center">
           <div class="text-center max-w-md">
-            <div class="text-6xl mb-4">&#128200;</div>
+            <div class="text-6xl mb-4" aria-hidden="true">&#128200;</div>
             <h2 class="text-xl font-semibold text-gray-900 mb-2">Design Explorer</h2>
             <p class="text-gray-500 mb-6">
               Explore multi-dimensional parametric design spaces. Load a CSV dataset to visualize

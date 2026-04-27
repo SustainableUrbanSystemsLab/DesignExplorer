@@ -19,3 +19,7 @@
 ## 2026-04-24 - Consistent Keyboard Navigation Focus Rings on Native Inputs
 **Learning:** Native input elements like range sliders and checkboxes often lack sufficient default focus indicators across browsers, making keyboard navigation difficult to track for users. While custom buttons often receive focus styles, native inputs are sometimes overlooked.
 **Action:** Always ensure that native interactive elements (`<input type="range">`, `<input type="checkbox">`) have consistent `focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1` styles to clearly indicate focus state.
+
+## 2024-04-27 - Form Semantics and Screen Reader Accessibility
+**Learning:** Svelte 5's accessibility linter strictly checks for interactive roles on non-interactive semantic elements (e.g., assigning `role="tabpanel"` to a `<form>` triggers an a11y warning).
+**Action:** When wrapping inputs to improve semantic submission (like replacing `div` + `onkeydown` with `<form>` + `onsubmit`), ensure the `<form>` remains a child of the container that manages ARIA layout roles like `tabpanel`, rather than replacing it.
