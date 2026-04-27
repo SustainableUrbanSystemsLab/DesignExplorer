@@ -182,7 +182,7 @@
               ondragover={handleDragOver}
               ondragleave={() => (dragOver = false)}
             >
-              <div class="text-4xl mb-3">&#128194;</div>
+              <div class="text-4xl mb-3" aria-hidden="true">&#128194;</div>
               <p class="text-sm text-gray-600 mb-2">
                 Drag & drop a <strong>.csv</strong> or <strong>.zip</strong> file here
               </p>
@@ -207,12 +207,19 @@
             role="tabpanel"
             aria-labelledby="tab-url"
             tabindex="0"
-            class="space-y-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl"
+            class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl"
           >
-            <div>
-              <label for="csv-url" class="block text-sm font-medium text-gray-700 mb-1">
-                CSV URL
-              </label>
+            <form
+              class="space-y-3"
+              onsubmit={(e) => {
+                e.preventDefault();
+                handleUrl();
+              }}
+            >
+              <div>
+                <label for="csv-url" class="block text-sm font-medium text-gray-700 mb-1">
+                  CSV URL
+                </label>
               <input
                 id="csv-url"
                 type="url"
@@ -220,9 +227,6 @@
                 placeholder="https://example.com/study/data.csv"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                onkeydown={(e) => {
-                  if (e.key === 'Enter') handleUrl();
-                }}
               />
             </div>
             <p class="text-xs text-gray-400">
@@ -230,19 +234,20 @@
               URL.
             </p>
             <button
-              onclick={handleUrl}
+              type="submit"
               disabled={loading || !urlInput.trim()}
               class="w-full px-4 py-2 bg-blue-600 text-white text-sm rounded-lg
                 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               {loading ? 'Loading...' : 'Load Dataset'}
             </button>
-            {#if loading}
-              <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden mt-3">
-                <div class="h-full bg-blue-600 rounded-full animate-loading-bar"></div>
-              </div>
-              <p class="text-xs text-gray-400 mt-1.5 text-center">Fetching dataset&hellip;</p>
-            {/if}
+              {#if loading}
+                <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden mt-3" role="progressbar" aria-label="Loading dataset">
+                  <div class="h-full bg-blue-600 rounded-full animate-loading-bar"></div>
+                </div>
+                <p class="text-xs text-gray-400 mt-1.5 text-center">Fetching dataset&hellip;</p>
+              {/if}
+            </form>
           </div>
         {/if}
 

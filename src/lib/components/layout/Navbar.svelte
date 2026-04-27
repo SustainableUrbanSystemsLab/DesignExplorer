@@ -160,6 +160,7 @@
           class="px-2.5 py-1.5 text-xs rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500
             {linkCopied ? 'bg-green-100 text-green-700' : 'text-gray-600 hover:bg-gray-100'}"
           title="Copy shareable link to clipboard"
+          aria-live="polite"
         >
           {linkCopied ? 'Copied!' : 'Copy Link'}
         </button>

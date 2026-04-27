@@ -99,7 +99,7 @@
   <div class="flex-1 overflow-auto p-2">
     {#if sortedRows.length === 0}
       <div class="h-full flex flex-col items-center justify-center text-center p-4">
-        <div class="text-3xl mb-2">&#128269;</div>
+        <div class="text-3xl mb-2" aria-hidden="true">&#128269;</div>
         <p class="text-sm font-medium text-gray-900">No designs found</p>
         <p class="text-xs text-gray-500 mt-1 mb-4 max-w-[250px]">
           Try adjusting your filters or clearing your selection to see more results.

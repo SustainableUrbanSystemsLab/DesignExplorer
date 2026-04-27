@@ -51,7 +51,7 @@
             colspan={displayColumns.length + 1}
             class="px-2 py-8 text-center border-b border-gray-100"
           >
-            <div class="text-3xl mb-2">&#128269;</div>
+            <div class="text-3xl mb-2" aria-hidden="true">&#128269;</div>
             <p class="text-sm font-medium text-gray-900">No designs found</p>
             <p class="text-xs text-gray-500 mt-1 mb-4">
               Try adjusting your filters or clearing your selection to see more results.
