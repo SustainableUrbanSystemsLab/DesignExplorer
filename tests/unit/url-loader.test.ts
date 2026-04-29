@@ -1,5 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  extractCsvFromReaderResponse,
+  loadFromUrl,
   resolveUrl,
   normalizeCloudUrl,
   normalizeGitHubPagesUrl,
@@ -49,16 +51,13 @@ describe('resolveUrl', () => {
   });
 
   it('trims whitespace', () => {
-    expect(resolveUrl('  https://example.com/test.png  ')).toBe(
-      'https://example.com/test.png',
-    );
+    expect(resolveUrl('  https://example.com/test.png  ')).toBe('https://example.com/test.png');
   });
 });
 
 describe('normalizeCloudUrl', () => {
   it('transforms Dropbox www URLs to dl.dropboxusercontent.com', () => {
-    const raw =
-      'https://www.dropbox.com/scl/fi/abc123/data.csv?rlkey=xyz&st=tok&dl=1';
+    const raw = 'https://www.dropbox.com/scl/fi/abc123/data.csv?rlkey=xyz&st=tok&dl=1';
     const result = normalizeCloudUrl(raw);
     expect(result).toContain('dl.dropboxusercontent.com');
     expect(result).toContain('/scl/fi/abc123/data.csv');
@@ -82,17 +81,13 @@ describe('normalizeCloudUrl', () => {
   it('transforms Google Drive file URLs', () => {
     const raw = 'https://drive.google.com/file/d/FILE_ID_123/view?usp=sharing';
     const result = normalizeCloudUrl(raw);
-    expect(result).toBe(
-      'https://drive.google.com/uc?export=download&id=FILE_ID_123',
-    );
+    expect(result).toBe('https://drive.google.com/uc?export=download&id=FILE_ID_123');
   });
 
   it('transforms Google Drive open URLs', () => {
     const raw = 'https://drive.google.com/open?id=FILE_ID_456';
     const result = normalizeCloudUrl(raw);
-    expect(result).toBe(
-      'https://drive.google.com/uc?export=download&id=FILE_ID_456',
-    );
+    expect(result).toBe('https://drive.google.com/uc?export=download&id=FILE_ID_456');
   });
 
   it('leaves non-cloud URLs unchanged', () => {
@@ -116,9 +111,7 @@ describe('normalizeGitHubPagesUrl', () => {
   });
 
   it('handles any org/repo combination', () => {
-    expect(
-      normalizeGitHubPagesUrl('https://myorg.github.io/my-repo/assets/img.png'),
-    ).toBe(
+    expect(normalizeGitHubPagesUrl('https://myorg.github.io/my-repo/assets/img.png')).toBe(
       'https://raw.githubusercontent.com/myorg/my-repo/gh-pages/assets/img.png',
     );
   });
@@ -129,8 +122,57 @@ describe('normalizeGitHubPagesUrl', () => {
   });
 
   it('leaves raw.githubusercontent.com URLs unchanged', () => {
-    const url =
-      'https://raw.githubusercontent.com/user/repo/main/data.csv';
+    const url = 'https://raw.githubusercontent.com/user/repo/main/data.csv';
     expect(normalizeGitHubPagesUrl(url)).toBe(url);
+  });
+});
+
+describe('extractCsvFromReaderResponse', () => {
+  it('strips Jina Reader metadata from CSV responses', () => {
+    const csv = 'ID[-],img\n0,image.png\n';
+    const readerText = `Title: \n\nURL Source: https://example.com/data.csv\n\nPublished Time: Sun, 05 Apr 2026 19:50:22 GMT\n\nMarkdown Content:\n${csv}`;
+
+    expect(extractCsvFromReaderResponse(readerText)).toBe(csv.trim());
+  });
+
+  it('leaves plain CSV responses unchanged', () => {
+    const csv = 'ID[-],img\n0,image.png\n';
+    expect(extractCsvFromReaderResponse(csv)).toBe(csv.trim());
+  });
+});
+
+describe('loadFromUrl', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('falls back to Jina Reader when direct fetch and legacy CORS proxies fail', async () => {
+    const rawUrl = 'https://eddycfd.uber.space/misc/DesignExplorer_SelectedResults.csv';
+    const csv = 'ID[-],img\n0,image.png\n';
+    const readerText = `Title: \n\nURL Source: ${rawUrl}\n\nMarkdown Content:\n${csv}`;
+
+    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+      const url = String(input);
+
+      if (url === rawUrl) {
+        return Promise.reject(new TypeError('Blocked by CORS'));
+      }
+
+      if (url === `https://r.jina.ai/${rawUrl}`) {
+        return Promise.resolve(new Response(readerText, { status: 200 }));
+      }
+
+      return Promise.resolve(new Response('proxy failed', { status: 403 }));
+    });
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await loadFromUrl(rawUrl);
+
+    expect(result.csvText).toBe(csv.trim());
+    expect(result.resolvedUrl).toBe(rawUrl);
+    expect(result.baseUrl).toBe('https://eddycfd.uber.space/misc/');
+    expect(fetchMock).toHaveBeenCalledWith(rawUrl, expect.any(Object));
+    expect(fetchMock).toHaveBeenCalledWith(`https://r.jina.ai/${rawUrl}`, expect.any(Object));
   });
 });

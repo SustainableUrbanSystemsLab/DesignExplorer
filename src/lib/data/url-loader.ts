@@ -22,15 +22,11 @@ export function normalizeCloudUrl(raw: string): string {
   // --- Google Drive ---
   // https://drive.google.com/file/d/{id}/view?...
   // https://drive.google.com/open?id={id}
-  const gdriveFileMatch = url.match(
-    /^https?:\/\/drive\.google\.com\/file\/d\/([^/]+)/i
-  );
+  const gdriveFileMatch = url.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^/]+)/i);
   if (gdriveFileMatch) {
     return `https://drive.google.com/uc?export=download&id=${gdriveFileMatch[1]}`;
   }
-  const gdriveOpenMatch = url.match(
-    /^https?:\/\/drive\.google\.com\/open\?.*id=([^&]+)/i
-  );
+  const gdriveOpenMatch = url.match(/^https?:\/\/drive\.google\.com\/open\?.*id=([^&]+)/i);
   if (gdriveOpenMatch) {
     return `https://drive.google.com/uc?export=download&id=${gdriveOpenMatch[1]}`;
   }
@@ -38,11 +34,27 @@ export function normalizeCloudUrl(raw: string): string {
   return url;
 }
 
-/** Public CORS proxies raced concurrently when a direct fetch is blocked. */
-const CORS_PROXIES = [
-  (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  (url: string) =>
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+type FetchFallback = {
+  name: string;
+  buildUrl: (url: string) => string;
+  transform?: (text: string) => string;
+};
+
+/** Public CORS fallbacks raced concurrently when a direct fetch is blocked. */
+const CORS_FALLBACKS: FetchFallback[] = [
+  {
+    name: 'Jina Reader',
+    buildUrl: (url: string) => `https://r.jina.ai/${url}`,
+    transform: extractCsvFromReaderResponse,
+  },
+  {
+    name: 'corsproxy.io',
+    buildUrl: (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  },
+  {
+    name: 'AllOrigins',
+    buildUrl: (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  },
 ];
 
 /** Timeout for each individual fetch attempt in ms. */
@@ -61,7 +73,7 @@ const RETRY_DELAY_MS = 500;
 async function fetchWithTimeout(
   url: string,
   timeoutMs: number,
-  externalSignal?: AbortSignal
+  externalSignal?: AbortSignal,
 ): Promise<string> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -81,6 +93,40 @@ async function fetchWithTimeout(
   }
 }
 
+function assertLikelyCsv(text: string, source: string): void {
+  const firstLine = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .find(Boolean);
+
+  if (!firstLine || !firstLine.includes(',')) {
+    throw new Error(`${source} did not return CSV data`);
+  }
+}
+
+export function extractCsvFromReaderResponse(text: string): string {
+  const marker = 'Markdown Content:';
+  const markerIndex = text.indexOf(marker);
+  const rawCsv = markerIndex >= 0 ? text.slice(markerIndex + marker.length) : text;
+
+  return rawCsv
+    .replace(/^\uFEFF/, '')
+    .replace(/^```(?:csv)?\s*/i, '')
+    .replace(/\s*```$/i, '')
+    .trim();
+}
+
+async function fetchCsvCandidate(
+  fallback: FetchFallback,
+  resolvedUrl: string,
+  signal?: AbortSignal,
+): Promise<string> {
+  const text = await fetchWithTimeout(fallback.buildUrl(resolvedUrl), FETCH_TIMEOUT_MS, signal);
+  const csvText = (fallback.transform ? fallback.transform(text) : text).trim();
+  assertLikelyCsv(csvText, fallback.name);
+  return csvText;
+}
+
 /**
  * Load CSV text from a URL.
  *
@@ -94,13 +140,10 @@ async function fetchWithTimeout(
  */
 export async function loadFromUrl(
   rawUrl: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<{ csvText: string; baseUrl: string; resolvedUrl: string }> {
   const resolvedUrl = normalizeCloudUrl(rawUrl);
-  const baseUrl = resolvedUrl.substring(
-    0,
-    resolvedUrl.lastIndexOf('/') + 1
-  );
+  const baseUrl = resolvedUrl.substring(0, resolvedUrl.lastIndexOf('/') + 1);
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     if (attempt > 0) {
@@ -113,26 +156,16 @@ export async function loadFromUrl(
 
     // --- Try direct fetch first (instant failure for CORS) ---
     try {
-      const csvText = await fetchWithTimeout(
-        resolvedUrl,
-        FETCH_TIMEOUT_MS,
-        signal
-      );
+      const csvText = await fetchWithTimeout(resolvedUrl, FETCH_TIMEOUT_MS, signal);
       return { csvText, baseUrl, resolvedUrl };
     } catch {
       // Direct fetch failed — try CORS proxies
     }
 
-    // --- Race all CORS proxies concurrently ---
+    // --- Race all CORS fallbacks concurrently ---
     try {
       const csvText = await Promise.any(
-        CORS_PROXIES.map((buildProxyUrl) =>
-          fetchWithTimeout(
-            buildProxyUrl(resolvedUrl),
-            FETCH_TIMEOUT_MS,
-            signal
-          )
-        )
+        CORS_FALLBACKS.map((fallback) => fetchCsvCandidate(fallback, resolvedUrl, signal)),
       );
       return { csvText, baseUrl, resolvedUrl };
     } catch {
@@ -141,7 +174,7 @@ export async function loadFromUrl(
   }
 
   throw new Error(
-    'Failed to fetch CSV after multiple attempts. The server may be temporarily unavailable or blocking cross-origin requests.'
+    'Failed to fetch CSV after multiple attempts. The server may be temporarily unavailable or blocking cross-origin requests.',
   );
 }
 
@@ -156,9 +189,7 @@ export async function loadFromUrl(
  *       → https://raw.githubusercontent.com/{org}/{repo}/gh-pages/path/to/file
  */
 export function normalizeGitHubPagesUrl(url: string): string {
-  const match = url.match(
-    /^https?:\/\/([^.]+)\.github\.io\/([^/]+)\/(.+)$/i
-  );
+  const match = url.match(/^https?:\/\/([^.]+)\.github\.io\/([^/]+)\/(.+)$/i);
   if (match) {
     const [, org, repo, path] = match;
     return `https://raw.githubusercontent.com/${org}/${repo}/gh-pages/${path}`;
