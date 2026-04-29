@@ -1,3 +1,9 @@
+## [3.1.1](https://github.com/SustainableUrbanSystemsLab/DesignExplorer/compare/v3.1.0...v3.1.1) (2026-04-29)
+
+### Bug Fixes
+
+* add resilient CSV URL fallback ([8c10c7a](https://github.com/SustainableUrbanSystemsLab/DesignExplorer/commit/8c10c7a0ffce1d680ba71b53741e8124b3016f63))
+
 ## [3.1.0](https://github.com/SustainableUrbanSystemsLab/DesignExplorer/compare/v3.0.0...v3.1.0) (2026-04-27)
 
 ### Features

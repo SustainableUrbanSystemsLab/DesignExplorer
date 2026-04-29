@@ -1,7 +1,7 @@
 {
   "name": "design-explorer",
   "private": true,
-  "version": "3.1.0",
+  "version": "3.1.1",
   "type": "module",
   "description": "Interactive multi-dimensional parametric design space explorer for architects and urban designers",
   "scripts": {
